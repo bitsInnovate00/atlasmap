@@ -31,6 +31,8 @@ import ky from 'ky/umd';
 import log from 'loglevel';
 import { timeout } from 'rxjs/operators';
 
+import { DocumentDefinition } from '../models/document-definition.model';
+
 /**
  * Handles file manipulation stored in the backend, including import/export via UI.
  */
@@ -277,6 +279,190 @@ export class FileManagementService {
         .catch((error: any) => {
           this.handleError('Error occurred while saving mapping.', error);
           observer.error(error);
+          observer.complete();
+        });
+    });
+  }
+
+  //bittu
+  registerAPI(request: any, artifactId: string): Observable<any> {
+    return new Observable<any>((observer: any) => {
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Registry-ArtifactId': artifactId,
+      };
+      console.log(request)
+      let url: string =
+        'http://localhost:8080/apis/registry/v2/groups/cetai/artifacts';
+        var params = new URLSearchParams();
+        params.append("ifExists", "RETURN");
+      let options: any = { body: request, headers: headers ,searchParams: params };
+
+      this.api
+        .post(url, options)
+        .json()
+        .then((responseJson: any) => {
+          console.log( `Document Service Response: ${JSON.stringify(responseJson)}`)
+          this.cfg.logger!.debug(
+            `Document Service Response: ${JSON.stringify(responseJson)}`
+          );
+          let result = {
+            artifactId: responseJson.id,
+            groupId: responseJson.groupId,
+          };
+          observer.next(result);
+          observer.complete();
+        })
+        .catch((error: any) => {
+          console.log(error)
+          observer.error(error);
+          observer.next();
+          observer.complete();
+        });
+    });
+  }
+
+  // addAtlasMappingRequest(
+  //   className: string,
+  //   isSource: boolean,
+  //   collectionType?: CollectionType,
+  //   collectionClassName?: string
+  // ): AtlasMappingRequest {
+  //   const model: DocumentInitializationModel = new DocumentInitializationModel();
+  //   model.id = className;
+  //   model.type = DocumentType.JAVA;
+  //   model.inspectionType = InspectionType.JAVA_CLASS;
+  //   model.inspectionSource = className;
+  //   model.inspectionParameters = { '': '' };
+  //   model.isSource = isSource;
+  //   model.collectionType = collectionType;
+  //   model.collectionClassName = collectionClassName;
+  //   model.description = 'Java document class ' + className;
+  //   if (collectionType) {
+  //     model.description += ' collection type: ' + collectionType;
+  //   }
+  //   if (collectionClassName) {
+  //     model.description += ' collection class name: ' + collectionClassName;
+  //   }
+  //   return this.cfg.addDocument(model);
+  // }
+
+  private createRecommendationRequest(): any {
+    let sourceArtifactId = 'ndcshopping19.2';
+    let sourceGroupId = 'cetai';
+    let targetArtifactId = 'iflyres_shopping_v1';
+    let targetGroupId = 'cetai';
+    console.log(this.cfg)
+    // const sourceDocDefn: DocumentDefinition = null;
+    if (this.cfg.sourceDocs) {
+      const sourceDocDefn: DocumentDefinition = this.cfg.sourceDocs[0];
+      console.log(' souce document ' + sourceDocDefn.inspectionSource);
+      this.registerAPI(sourceDocDefn.inspectionSource, sourceArtifactId)
+        .toPromise()
+        .then(({ artifactId, groupId }) => {
+          console.log(artifactId + ': ' + groupId);
+          sourceArtifactId = artifactId;
+          sourceGroupId = groupId;
+        });
+    }
+    if (this.cfg.targetDocs) {
+      const targetDocDefn: DocumentDefinition = this.cfg.targetDocs[0];
+      console.log(' target document ' + targetDocDefn.inspectionResult);
+
+      this.registerAPI(targetDocDefn.inspectionSource, targetArtifactId)
+        .toPromise()
+        .then(({ artifactId, groupId }) => {
+          console.log(artifactId + ': ' + groupId);
+          targetArtifactId = artifactId;
+          targetGroupId = groupId;
+        });
+    }
+
+    return {
+      RecommendationRequest: {
+      sourceArtifactId: sourceArtifactId,
+      targetArtifactId: targetArtifactId,
+      mappingDefinitionId: this.cfg.mappingDefinitionId,
+      field: {},
+      }
+    };
+  }
+
+  showAIAtlasMapping(): void {
+    console.log('showAIAtlasMapping in file service bittu ');
+    //  console.log({sampledata})
+
+    const RecommendationRequest = this.createRecommendationRequest();
+    console.log(RecommendationRequest);
+    this.getAIRecommendation(RecommendationRequest)
+      .toPromise()
+      .then((response: any) => {
+        console.log('Got the final AtlasMappings ' + JSON.stringify(response));
+      });
+
+    // MappingSerializer.deserializeMappingServiceJSON(
+    //   sampledata,
+    //   this.cfg
+    // );
+    // console.log(this.cfg);
+  }
+
+  // private getAIRecommendationJson(request: any): Observable<any> {
+  //   return new Observable<any>((observer: any) => {
+  //     const baseURL: string =
+  //       this.cfg.initCfg.baseMappingServiceUrl + 'AtlasMapping/';
+  //       const headers = { 'Content-Type': 'application/json' };
+  //       let options: any = { json: request, headers: headers };
+
+  //     this.api
+  //       .get(baseURL)
+  //       .json()
+  //       .then((body: any) => {
+  //         this.cfg.logger!.debug(
+  //           `Mapping Service Response: ${JSON.stringify(body)}`
+  //         );
+  //         if (body) {
+  //           observer.next(body);
+  //         } else {
+  //           observer.next(undefined);
+  //         }
+  //         observer.complete();
+  //       })
+  //       .catch((error: any) => {
+  //         if (error.status !== DataMapperUtil.HTTP_STATUS_NO_CONTENT) {
+  //           this.handleError(
+  //             'Error occurred while accessing the current mappings from the backend service.',
+  //             error
+  //           );
+  //           observer.error(error);
+  //         }
+  //         observer.complete();
+  //       });
+  //   });
+  // }
+
+  getAIRecommendation(request: any): Observable<any> {
+    return new Observable<any>((observer: any) => {
+      const headers = { 'Content-Type': 'application/json' };
+      // let url: string = 'http://localhost:8080/apis/registry/v2/groups/cetai/artifacts?ifExists=RETURN';
+      let options: any = { json: request, headers: headers };
+      const baseURL: string =
+        this.cfg.initCfg.baseMappingServiceUrl + 'recommendations/';
+
+      this.api
+        .post(baseURL, options)
+        .json()
+        .then((responseJson: any) => {
+          this.cfg.logger!.debug(
+            `AI Recommendation Response: ${JSON.stringify(responseJson)}`
+          );
+
+          observer.next(responseJson);
+          observer.complete();
+        })
+        .catch((error: any) => {
+          observer.error(error);
+          observer.next();
           observer.complete();
         });
     });

@@ -82,6 +82,7 @@ import {
   editNamespace,
   deleteNamespace,
   fromFieldToIFieldsNode,
+  showAIAtlasMapping,
 } from "./utils";
 import {
   INotificationsState,
@@ -455,6 +456,11 @@ export function useAtlasmap() {
     [onLoading],
   );
 
+  const displayAIAtlasMapping = useCallback(() => {
+    //alert('showAI AtlasMapping ');
+    showAIAtlasMapping();
+  }, []);
+
   const handleResetAtlasmap = useCallback(() => {
     onReset();
     resetAtlasmap();
@@ -676,5 +682,6 @@ export function useAtlasmap() {
     changeDocumentName,
     getEnumerationValues,
     isEnumerationMapping,
+    displayAIAtlasMapping,
   };
 }

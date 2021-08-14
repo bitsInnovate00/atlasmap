@@ -58,6 +58,17 @@ export function exportAtlasFile(fileName: string) {
 }
 
 /**
+ * 
+ * @param selectedFile bittu
+ * @param cfg 
+ */
+
+export function showAIAtlasMapping() {
+  const cfg = ConfigModel.getConfig();
+  return cfg.fileService.showAIAtlasMapping();
+}
+
+/**
  * A user has selected a compressed mappings catalog file to be imported into the canvas.
  *
  * @param selectedFile - user-specified ADM catalog file.

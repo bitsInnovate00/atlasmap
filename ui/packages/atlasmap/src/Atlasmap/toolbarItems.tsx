@@ -27,6 +27,7 @@ import {
   TrashIcon,
   CaretDownIcon,
   PlusIcon,
+  BrainIcon,
 } from "@patternfly/react-icons";
 import { css, StyleSheet } from "@patternfly/react-styles";
 import { useToggle } from "../Atlasmap/utils";
@@ -436,6 +437,27 @@ export const AddMappingToolbarItem: FunctionComponent<{
         data-testid="add-new-mapping-button"
       >
         <PlusIcon />
+      </Button>
+    </Tooltip>
+  </ToolbarItem>
+);
+
+export const ShowAIAtlasMappingToolbarItem: FunctionComponent<{
+  onClick: () => void;
+}> = ({ onClick }) => (
+  <ToolbarItem>
+    <Tooltip
+      position={"auto"}
+      enableFlip={true}
+      content={<div>Show AI AtlasMapping</div>}
+    >
+      <Button
+        variant={"plain"}
+        aria-label="Show AI AtlasMapping"
+        onClick={onClick}
+        data-testid="show-ai-AtlasMapping-button"
+      >
+        <BrainIcon />
       </Button>
     </Tooltip>
   </ToolbarItem>

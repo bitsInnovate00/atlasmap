@@ -17,7 +17,11 @@ package io.atlasmap.service;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,6 +38,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -41,6 +49,11 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.spi.ResteasyConfiguration;
+// import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+// import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,9 +77,11 @@ import io.atlasmap.v2.Mapping;
 import io.atlasmap.v2.MappingFileType;
 import io.atlasmap.v2.ProcessMappingRequest;
 import io.atlasmap.v2.ProcessMappingResponse;
+import io.atlasmap.v2.Recommendation;
 import io.atlasmap.v2.StringMap;
 import io.atlasmap.v2.StringMapEntry;
 import io.atlasmap.v2.Validations;
+import io.atlasmap.v2.RecommendationRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -136,6 +151,140 @@ public class AtlasService {
         }
         this.previewContext = atlasContextFactory.createPreviewContext();
     }
+
+      // bittu
+
+      // TO do   1. atlasmapping object along with the request and complete the output
+         
+
+      @POST
+      @Path("/recommendations")
+      @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_OCTET_STREAM })
+      @Produces(MediaType.APPLICATION_JSON)
+      public Response listAIAtlasMappings(InputStream inputStream) {
+  
+          RecommendationRequest recommendationRequest = fromJson(inputStream, RecommendationRequest.class);
+          System.out.println(" The input mapping as json " + recommendationRequest);
+         Client client= ClientBuilder.newBuilder().build();
+         WebTarget target = client.target("http://192.168.153.165:9999/aimapper");
+         Recommendation recommendations=target.request(MediaType.APPLICATION_JSON).post(Entity.json(recommendationRequest), Recommendation.class);
+         client.close();
+         System.out.println(" Recommendations are "+ recommendations);
+         ADMArchiveHandler admHandler = loadExplodedMappingDirectory(recommendationRequest.getMappingDefinitionId());
+        AtlasMapping mapping = admHandler.getMappingDefinition();
+        RecommendationToAtlasAdapter.covertMapping(mapping, recommendations);
+        byte[] serialized = null;
+            try {
+                serialized = admHandler.getMappingDefinitionBytes();
+            } catch (Exception e) {
+                LOG.error("Error retrieving mapping definition file for ID:" + recommendationRequest.getMappingDefinitionId(), e);
+                throw new WebApplicationException(e.getMessage(), e, Status.INTERNAL_SERVER_ERROR);
+            }
+            if (LOG.isDebugEnabled() && serialized != null) {
+                LOG.debug(new String(serialized));
+            }
+            if (serialized == null) {
+                LOG.debug("Mapping definition not found for ID:{}", recommendationRequest.getMappingDefinitionId());
+                return Response.noContent().build();
+            }
+            return Response.ok().entity(serialized).build();
+      
+        //   ResteasyClient client = new ResteasyClientBuilder().build();
+        //   ResteasyWebTarget target = client.target("http://172.20.87.91:9999/aimapper");
+        //   Response response1 = target.request().post(Entity.entity(user, "application/vnd.com.demo.user-management.user+xml;charset=UTF-8;version=1"));
+        //   //Read output in string format
+        //   System.out.println(response1.getStatus());
+        //   response1.close();  
+
+         
+        //   StringBuffer response = new StringBuffer();
+        //   try {
+        //       URL url = new URL("http://192.168.153.165:9999/aimapper");
+        //       HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        //       con.setRequestMethod("POST");
+        //       con.setRequestProperty("Content-Type", "application/json; utf-8");
+        //       con.setRequestProperty("Accept", "application/json");
+        //       con.setDoOutput(true);
+        //       DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        //       wr.write(readIntoByteArray(inputStream));
+        //       wr.flush();
+        //       wr.close();
+  
+        //       int responseCode = con.getResponseCode();
+        //       System.out.println("nSending 'POST' request to UL : " + url);
+        //       System.out.println("Post Data : " + recommendationRequest);
+        //       System.out.println("Response Code : " + responseCode);
+  
+        //       BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        //       String output;
+             
+  
+        //       while ((output = in.readLine()) != null) {
+        //           response.append(output);
+        //       }
+        //       in.close();
+  
+        //       // printing result from response
+        //       System.out.println(response.toString());
+        //       Recommendation recommendation =  Json.withClassLoader(this.libraryLoader).readValue(response.toString(), Recommendation.class);
+
+        //       System.out.println("##########recommendation ##########"+recommendation);
+        //   } catch (Exception e) {
+        //       e.printStackTrace();
+        //   }
+
+        
+          /// additional
+        //   StringMap sMap = new StringMap();
+        // LOG.debug("listMappings with filter '{}'", filter);
+
+        // ADMArchiveHandler handler = loadExplodedMappingDirectory(mappingDefinitionId);
+        // AtlasMapping map = handler.getMappingDefinition();
+        // if (map == null) {
+        //     return Response.ok().entity(toJson(sMap)).build();
+        // }
+        // StringMapEntry mapEntry = new StringMapEntry();
+        // mapEntry.setName(map.getName());
+        // UriBuilder builder = uriInfo.getBaseUriBuilder().path("v2").path("atlas").path("mapping")
+        //     .path(map.getName());
+        // mapEntry.setValue(builder.build().toString());
+        // sMap.getStringMapEntry().add(mapEntry);
+
+        // byte[] serialized = toJson(sMap);
+        // if (LOG.isDebugEnabled()) {
+        //     LOG.debug(new String(serialized));
+        // }
+        // return Response.ok().entity(serialized).build();
+  
+          // ResteasyClient client = new ResteasyClientBuilder().build();
+          // ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
+          // ServicesInterface proxy = target.proxy(ServicesInterface.class);
+  
+          // POST
+          // Response moviesResponse = proxy.addMovie();
+          // System.out.println("HTTP code: " + moviesResponse.getStatus());
+          // moviesResponse.close();
+  
+          // external AI call
+          // conversion
+          
+      }
+  
+      private byte[] readIntoByteArray(InputStream in) throws Exception {
+          try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+              redirectStream(in, baos);
+              return baos.toByteArray();
+          }
+      }
+  
+      private void redirectStream(InputStream in, OutputStream out) throws Exception {
+          int len = 0;
+          byte[] buffer = new byte[2048];
+          while ((len = in.read(buffer)) > 0) {
+              out.write(buffer, 0, len);
+          }
+      }
+
 
     @GET
     @Path("/fieldActions")
@@ -663,7 +812,7 @@ public class AtlasService {
 
     private <T> T fromJson(InputStream value, Class<T>clazz) {
         try {
-            if (LOG.isDebugEnabled()) {
+            // if (LOG.isDebugEnabled()) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(value));
                 StringBuffer buf = new StringBuffer();
                 String line;
@@ -672,8 +821,8 @@ public class AtlasService {
                 }
                 LOG.debug(buf.toString());
                 return Json.withClassLoader(this.libraryLoader).readValue(buf.toString(), clazz);
-            }
-            return Json.withClassLoader(this.libraryLoader).readValue(value, clazz);
+            // }
+            // return Json.withClassLoader(this.libraryLoader).readValue(value, clazz);
         } catch (IOException e) {
             throw new WebApplicationException(e, Status.BAD_REQUEST);
         }
