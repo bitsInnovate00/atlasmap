@@ -103,6 +103,7 @@ import {
   toggleShowMappedFields,
   toggleShowUnmappedFields,
   trailerId,
+  showAIAtlasMapping,
 } from './utils';
 
 import { LogLevelDesc } from 'loglevel';
@@ -492,6 +493,11 @@ export function useAtlasmap() {
     [configModel],
   );
 
+  const displayAIAtlasMapping = useCallback(() => {
+    //alert('showAI AtlasMapping ');
+    showAIAtlasMapping();
+  }, []);
+
   const handleResetAtlasmap = useCallback(() => {
     onReset();
     resetAtlasmap();
@@ -649,5 +655,6 @@ export function useAtlasmap() {
     getEnumerationValues,
     isEnumerationMapping,
     configModel,
+    displayAIAtlasMapping,
   };
 }

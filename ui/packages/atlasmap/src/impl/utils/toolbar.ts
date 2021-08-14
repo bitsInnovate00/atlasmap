@@ -131,3 +131,15 @@ export function toggleShowUnmappedFields(enabled: boolean) {
 
   return enabled;
 }
+
+/**
+ * 
+ * @param selectedFile bittu
+ * @param cfg 
+ */
+
+export function showAIAtlasMapping() {
+  const cfg = ConfigModel.getConfig();
+  return cfg.fileService.showAIAtlasMapping();
+}
+
