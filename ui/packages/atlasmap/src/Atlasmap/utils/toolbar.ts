@@ -58,9 +58,9 @@ export function exportAtlasFile(fileName: string) {
 }
 
 /**
- * 
+ *
  * @param selectedFile bittu
- * @param cfg 
+ * @param cfg
  */
 
 export function showAIAtlasMapping() {
