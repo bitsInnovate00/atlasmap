@@ -424,6 +424,89 @@ ifdef::internal-generation[]
 endif::internal-generation[]
 
 
+[.listAIAtlasMappings]
+==== listAIAtlasMappings
+    
+`POST /recommendations`
+
+
+
+===== Description 
+
+
+
+
+// markup not found, no include::{specDir}recommendations/POST/spec.adoc[opts=optional]
+
+
+
+===== Parameters
+
+
+====== Body Parameter
+
+[cols="2,3,1,1,1"]
+|===         
+|Name| Description| Required| Default| Pattern
+
+| body 
+|  <<object>> 
+| - 
+|  
+|  
+
+|===         
+
+
+
+
+
+===== Return Type
+
+
+
+-
+
+===== Content Type
+
+* application/json
+
+===== Responses
+
+.http response codes
+[cols="2,3,1"]
+|===         
+| Code | Message | Datatype 
+
+
+| 0
+| default response
+|  <<>>
+
+|===         
+
+===== Samples
+
+
+// markup not found, no include::{snippetDir}recommendations/POST/http-request.adoc[opts=optional]
+
+
+// markup not found, no include::{snippetDir}recommendations/POST/http-response.adoc[opts=optional]
+
+
+
+// file not found, no * wiremock data link :recommendations/POST/POST.json[]
+
+
+ifdef::internal-generation[]
+===== Implementation
+
+// markup not found, no include::{specDir}recommendations/POST/implementation.adoc[opts=optional]
+
+
+endif::internal-generation[]
+
+
 [.listFieldActions]
 ==== listFieldActions
 

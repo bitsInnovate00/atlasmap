@@ -231,6 +231,7 @@ export function useContextToolbar({
       toggleShowUnmappedFields,
       showAddNewMappingToolbarItem,
       newMapping,
+      showAIAtlasMappingToolbarItem,
       displayAIAtlasMapping,
     ],
   );
