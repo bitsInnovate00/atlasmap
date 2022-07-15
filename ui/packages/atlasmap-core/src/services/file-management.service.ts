@@ -32,6 +32,7 @@ import log from 'loglevel';
 import { timeout } from 'rxjs/operators';
 
 import { DocumentDefinition } from '../models/document-definition.model';
+import { RecommendationField } from '../models/recommendation.model';
 
 /**
  * Handles file manipulation stored in the backend, including import/export via UI.
@@ -291,18 +292,24 @@ export class FileManagementService {
         'Content-Type': 'application/json',
         'X-Registry-ArtifactId': artifactId,
       };
-      console.log(request)
+      console.log(request);
       let url: string =
         'http://localhost:8080/apis/registry/v2/groups/cetai/artifacts';
-        var params = new URLSearchParams();
-        params.append("ifExists", "RETURN");
-      let options: any = { body: request, headers: headers ,searchParams: params };
+      var params = new URLSearchParams();
+      params.append('ifExists', 'RETURN');
+      let options: any = {
+        body: request,
+        headers: headers,
+        searchParams: params,
+      };
 
       this.api
         .post(url, options)
         .json()
         .then((responseJson: any) => {
-          console.log( `Document Service Response: ${JSON.stringify(responseJson)}`)
+          console.log(
+            `Document Service Response: ${JSON.stringify(responseJson)}`
+          );
           this.cfg.logger!.debug(
             `Document Service Response: ${JSON.stringify(responseJson)}`
           );
@@ -314,7 +321,7 @@ export class FileManagementService {
           observer.complete();
         })
         .catch((error: any) => {
-          console.log(error)
+          console.log(error);
           observer.error(error);
           observer.next();
           observer.complete();
@@ -352,39 +359,64 @@ export class FileManagementService {
     let sourceGroupId = 'cetai';
     let targetArtifactId = 'iflyres_shopping_v1';
     let targetGroupId = 'cetai';
-    console.log(this.cfg)
+    console.log(this.cfg);
     // const sourceDocDefn: DocumentDefinition = null;
-    if (this.cfg.sourceDocs) {
-      const sourceDocDefn: DocumentDefinition = this.cfg.sourceDocs[0];
-      console.log(' souce document ' + sourceDocDefn.inspectionSource);
-      this.registerAPI(sourceDocDefn.inspectionSource, sourceArtifactId)
-        .toPromise()
-        .then(({ artifactId, groupId }) => {
-          console.log(artifactId + ': ' + groupId);
-          sourceArtifactId = artifactId;
-          sourceGroupId = groupId;
-        });
-    }
-    if (this.cfg.targetDocs) {
-      const targetDocDefn: DocumentDefinition = this.cfg.targetDocs[0];
-      console.log(' target document ' + targetDocDefn.inspectionResult);
+    // if (this.cfg.sourceDocs) {
+    //   const sourceDocDefn: DocumentDefinition = this.cfg.sourceDocs[0];
+    //   console.log(' souce document ' + sourceDocDefn.inspectionSource);
+    //   this.registerAPI(sourceDocDefn.inspectionSource, sourceArtifactId)
+    //     .toPromise()
+    //     .then(({ artifactId, groupId }) => {
+    //       console.log(artifactId + ': ' + groupId);
+    //       sourceArtifactId = artifactId;
+    //       sourceGroupId = groupId;
+    //     });
+    // }
+    // if (this.cfg.targetDocs) {
+    //   const targetDocDefn: DocumentDefinition = this.cfg.targetDocs[0];
+    //   console.log(' target document ' + targetDocDefn.inspectionResult);
 
-      this.registerAPI(targetDocDefn.inspectionSource, targetArtifactId)
-        .toPromise()
-        .then(({ artifactId, groupId }) => {
-          console.log(artifactId + ': ' + groupId);
-          targetArtifactId = artifactId;
-          targetGroupId = groupId;
-        });
-    }
+    //   this.registerAPI(targetDocDefn.inspectionSource, targetArtifactId)
+    //     .toPromise()
+    //     .then(({ artifactId, groupId }) => {
+    //       console.log(artifactId + ': ' + groupId);
+    //       targetArtifactId = artifactId;
+    //       targetGroupId = groupId;
+    //     });
+    // }
 
+    var sourceArray:RecommendationField[] = [] ;
+
+    this.cfg.sourceDocs[0].allFields.forEach(field => {
+      // var tmpField:RecommendationField = { field.path,};
+      // tmpField.path=field.path;
+      // tmpField.name=field.name;
+      if(field.children.length == 0)
+      {
+        sourceArray.push( new RecommendationField(field));
+      }
+    });
+
+
+    var targetArray:RecommendationField[] = [] ;
+
+    this.cfg.targetDocs[0].allFields.forEach(field => {
+      targetArray.push( new RecommendationField(field));
+    });
+
+    console.log(' souce array count ' + this.cfg.sourceDocs[0].allFields.length);
+
+    console.log(' filtered souce array count' + sourceArray.length);
+    console.log( targetArray);
     return {
       RecommendationRequest: {
-      sourceArtifactId: sourceArtifactId,
-      targetArtifactId: targetArtifactId,
-      mappingDefinitionId: this.cfg.mappingDefinitionId,
-      field: {},
-      }
+        sourceArtifactId: sourceArtifactId,
+        targetArtifactId̥: targetArtifactId,
+        mappingDefinitionId: this.cfg.mappingDefinitionId,
+        sourceFields: sourceArray,
+        targetFields: targetArray,
+        field: {},
+      },
     };
   }
 

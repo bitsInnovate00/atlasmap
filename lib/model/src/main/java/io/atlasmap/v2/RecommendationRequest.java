@@ -17,6 +17,7 @@ package io.atlasmap.v2;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonRootName;
@@ -36,6 +37,9 @@ public class RecommendationRequest implements Serializable {
     protected String sourceArtifactId;
     protected String targetArtifactId;
     protected Integer mappingDefinitionId;
+    protected Field[] sourceFields;
+    protected Field[] targetFields;
+    
     protected RecommendationField field;
     public String getSourceArtifactId() {
         return sourceArtifactId;
@@ -62,11 +66,27 @@ public class RecommendationRequest implements Serializable {
     public void setMappingDefinitionId(Integer mappingDefinitionId) {
         this.mappingDefinitionId = mappingDefinitionId;
     }
+
+    
+    public Field[] getSourceFields() {
+        return sourceFields;
+    }
+    public void setSourceFields(Field[] sourceFields) {
+        this.sourceFields = sourceFields;
+    }
+    public Field[] getTargetFields() {
+        return targetFields;
+    }
+    public void setTargetFields(Field[] targetFields) {
+        this.targetFields = targetFields;
+    }
     @Override
     public String toString() {
-        return "RecommendationRequest [field=" + field + ", mappindDefinitionId=" + mappingDefinitionId
-                + ", sourceArtifactId=" + sourceArtifactId + ", targetArtifactId=" + targetArtifactId + "]";
+        return "RecommendationRequest [field=" + field + ", mappingDefinitionId=" + mappingDefinitionId
+                + ", sourceArtifactId=" + sourceArtifactId + ", sourceFields=" + Arrays.toString(sourceFields)
+                + ", targetArtifactId=" + targetArtifactId + ", targetFields=" + Arrays.toString(targetFields) + "]";
     }
+    
 
 
 

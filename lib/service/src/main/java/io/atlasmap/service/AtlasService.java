@@ -114,8 +114,7 @@ public class AtlasService {
         else {
             baseFolder = "target";
         }
-
-        mappingFolder = baseFolder + File.separator + "mappings";
+        // mappingFol̥der = baseFolder + File.separator + "mappings";
         libFolder = baseFolder + File.separator + "lib";
 
         this.libraryLoader = new AtlasLibraryLoader(libFolder);
@@ -161,9 +160,9 @@ public class AtlasService {
       @Path("/recommendations")
       @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_OCTET_STREAM })
       @Produces(MediaType.APPLICATION_JSON)
-      public Response listAIAtlasMappings(InputStream inputStream) {
+      public Response listAIAtlasMappings(InputStream inputStream) throws AtlasException{
   
-          RecommendationRequest recommendationRequest = fromJson(inputStream, RecommendationRequest.class);
+        RecommendationRequest recommendationRequest = fromJson(inputStream, RecommendationRequest.class);
           System.out.println(" The input mapping as json " + recommendationRequest);
          Client client= ClientBuilder.newBuilder().build();
          WebTarget target = client.target("http://192.168.153.165:9999/aimapper");
@@ -172,6 +171,10 @@ public class AtlasService {
          System.out.println(" Recommendations are "+ recommendations);
          ADMArchiveHandler admHandler = loadExplodedMappingDirectory(recommendationRequest.getMappingDefinitionId());
         AtlasMapping mapping = admHandler.getMappingDefinition();
+        AtlasContext context = atlasContextFactory.createContext(mapping);
+        AtlasSession session = context.createSession();
+        System.out.println("session details " + session.getDefaultSourceDocument());
+        
         RecommendationToAtlasAdapter.covertMapping(mapping, recommendations);
         byte[] serialized = null;
             try {
