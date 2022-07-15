@@ -14,11 +14,36 @@
     limitations under the License.
 */
 
+import { Field } from ".";
+
 export class RecommendationField {
-  fieldPath: string;
+  path: string;
   name: string;
+  type: string;
+  usercreated: boolean;
+  isArray: boolean;
+  isAttribute: boolean;
+  isCollection:  boolean;
+  isPrimitive: boolean;
+  namespaceAlias: string | null;
   artifactid: string;
-  fieldtype: string;
+
+  constructor(field: Field) {
+    this.path=field.path;
+    this.name=field.name;
+    this.type=field.type;
+    this.usercreated=field.userCreated;
+    this.isArray=field.isArray;
+    this.isAttribute=field.isAttribute;
+    this.isCollection=field.isCollection;
+    this.isPrimitive=field.isPrimitive;
+    this.namespaceAlias=field.namespaceAlias;
+
+    // this._identifier = ErrorInfo.errorIdentifierCounter.toString();
+    // ErrorInfo.errorIdentifierCounter++;
+    // Object.assign(this, init);
+  }
+  
 }
 
 export class RecommendationRequest {
