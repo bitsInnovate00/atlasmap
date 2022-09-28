@@ -114,7 +114,7 @@ public class AtlasService {
         else {
             baseFolder = "target";
         }
-        // mappingFol̥der = baseFolder + File.separator + "mappings";
+        mappingFolder = baseFolder + File.separator + "mappings";
         libFolder = baseFolder + File.separator + "lib";
 
         this.libraryLoader = new AtlasLibraryLoader(libFolder);
@@ -153,6 +153,7 @@ public class AtlasService {
 
       // bittu
 
+
       // TO do   1. atlasmapping object along with the request and complete the output
          
 
@@ -161,11 +162,11 @@ public class AtlasService {
       @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_OCTET_STREAM })
       @Produces(MediaType.APPLICATION_JSON)
       public Response listAIAtlasMappings(InputStream inputStream) throws AtlasException{
-  
+        System.out.println("testing");
         RecommendationRequest recommendationRequest = fromJson(inputStream, RecommendationRequest.class);
           System.out.println(" The input mapping as json " + recommendationRequest);
          Client client= ClientBuilder.newBuilder().build();
-         WebTarget target = client.target("http://192.168.153.165:9999/aimapper");
+         WebTarget target = client.target("http://localhost:8080/fieldmapping");
          Recommendation recommendations=target.request(MediaType.APPLICATION_JSON).post(Entity.json(recommendationRequest), Recommendation.class);
          client.close();
          System.out.println(" Recommendations are "+ recommendations);

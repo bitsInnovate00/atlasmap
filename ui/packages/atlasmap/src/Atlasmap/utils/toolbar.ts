@@ -15,6 +15,7 @@ import {
 } from "./document";
 
 import * as constants from "../../atlasmap.json";
+import { Field } from "@atlasmap/core";
 
 /**
  * Return true if the specified file object exists as a source or target
@@ -66,6 +67,11 @@ export function exportAtlasFile(fileName: string) {
 export function showAIAtlasMapping() {
   const cfg = ConfigModel.getConfig();
   return cfg.fileService.showAIAtlasMapping();
+}
+
+export function showSingleAIAtlasMapping(field: Field) {
+  const cfg = ConfigModel.getConfig();
+  return cfg.fileService.showSingleAIAtlasMapping(field);
 }
 
 /**

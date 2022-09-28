@@ -83,6 +83,7 @@ import {
   deleteNamespace,
   fromFieldToIFieldsNode,
   showAIAtlasMapping,
+  showSingleAIAtlasMapping,
 } from "./utils";
 import {
   INotificationsState,
@@ -461,6 +462,12 @@ export function useAtlasmap() {
     showAIAtlasMapping();
   }, []);
 
+  const singleFieldMapping = useCallback((node: IAtlasmapField) => {
+    const field = (node as IAtlasmapField).amField;
+    //alert('showAI AtlasMapping ');
+    showSingleAIAtlasMapping(field);
+  }, []);
+
   const handleResetAtlasmap = useCallback(() => {
     onReset();
     resetAtlasmap();
@@ -683,5 +690,6 @@ export function useAtlasmap() {
     getEnumerationValues,
     isEnumerationMapping,
     displayAIAtlasMapping,
+    singleFieldMapping,
   };
 }

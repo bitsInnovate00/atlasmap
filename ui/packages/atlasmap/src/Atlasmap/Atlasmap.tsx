@@ -82,6 +82,7 @@ export const Atlasmap: FunctionComponent<IAtlasmapProps> = ({
     onAddToMapping,
     onRemoveFromMapping,
     onCreateMapping,
+    singleFieldMapping,
     isEnumerationMapping,
   } = useAtlasmap();
 
@@ -215,6 +216,7 @@ export const Atlasmap: FunctionComponent<IAtlasmapProps> = ({
       onFieldPreviewChange,
       canStartMapping: () => true, // TODO: check that there is at least one target field unmapped and compatible
       onStartMapping: (field) => onCreateMapping(field, undefined),
+      singleFieldMapping: (field) => singleFieldMapping(field),
     }),
     [
       selectMapping,
@@ -233,6 +235,7 @@ export const Atlasmap: FunctionComponent<IAtlasmapProps> = ({
       isFieldAddableToSelection,
       isFieldRemovableFromSelection,
       sourceProperties,
+      singleFieldMapping,
     ],
   );
 
@@ -295,6 +298,7 @@ export const Atlasmap: FunctionComponent<IAtlasmapProps> = ({
       onFieldPreviewChange,
       canStartMapping: (field) => !field.isConnected,
       onStartMapping: (field) => onCreateMapping(undefined, field),
+      singleFieldMapping: (field) => singleFieldMapping(field),
     }),
     [
       selectMapping,
@@ -312,6 +316,7 @@ export const Atlasmap: FunctionComponent<IAtlasmapProps> = ({
       isFieldAddableToSelection,
       isFieldRemovableFromSelection,
       targetProperties,
+      singleFieldMapping,
     ],
   );
 

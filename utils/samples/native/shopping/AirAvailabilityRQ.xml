@@ -1,0 +1,36 @@
+
+
+<soap:Envelope
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <ns2:AirAvailabilityRQ
+            xmlns:ns2="http://www.ibsplc.com/iRes/simpleTypes/">
+            <AirlineCode>V1</AirlineCode>
+            <AvailabilitySearches>
+                <Origin>FRA</Origin>
+                <Destination>AYT</Destination>
+                <TravelDate>2019-11-15T00:00:00Z</TravelDate>
+                <PositiveDaysOut>0</PositiveDaysOut>
+                <PreferredTimeOfDay>AnyTime</PreferredTimeOfDay>
+                <NegativeDaysOut>0</NegativeDaysOut>
+                <canSearchNearbyOrigin>false</canSearchNearbyOrigin>
+                <canSearchNearbyDestination>false</canSearchNearbyDestination>
+                <BestFarePossitiveDaysOut>0</BestFarePossitiveDaysOut>
+                <BestFareNegativeDaysOut>0</BestFareNegativeDaysOut>
+            </AvailabilitySearches>
+            <PaxCountDetails>
+                <PaxType>ADULT</PaxType>
+                <PaxCount>1</PaxCount>
+            </PaxCountDetails>
+            <TripType>OW</TripType>
+            <FareLevels>ST</FareLevels>
+            <FareTypes>SUNECO</FareTypes>
+            <PointOfPurchase>DE</PointOfPurchase>
+            <BookingChannel>
+                <ChannelType>API</ChannelType>
+                <Channel>Guest EN</Channel>
+                <Locale>en_US</Locale>
+            </BookingChannel>
+        </ns2:AirAvailabilityRQ>
+    </soap:Body>
+</soap:Envelope>

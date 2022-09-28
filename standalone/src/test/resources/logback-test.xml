@@ -26,9 +26,9 @@
     <file>target/runtime.log</file>
   </appender>
 
-  <logger name="io.atlasmap" level="INFO"/>
+  <logger name="io.atlasmap" level="DEBUG"/>
 
-  <root level="INFO">
+  <root level="DEBUG">
     <appender-ref ref="STDOUT"/>
     <appender-ref ref="FILE"/>
   </root>

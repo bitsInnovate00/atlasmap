@@ -33,6 +33,7 @@ import { timeout } from 'rxjs/operators';
 
 import { DocumentDefinition } from '../models/document-definition.model';
 import { RecommendationField } from '../models/recommendation.model';
+import { Field } from 'src/models';
 
 /**
  * Handles file manipulation stored in the backend, including import/export via UI.
@@ -354,6 +355,19 @@ export class FileManagementService {
   //   return this.cfg.addDocument(model);
   // }
 
+  private createRecommRequestFieldArray(): any {
+    var sourceArray: RecommendationField[] = [];
+
+    this.cfg.sourceDocs[0].allFields.forEach((field) => {
+      // var tmpField:RecommendationField = { field.path,};
+      // tmpField.path=field.path;
+      // tmpField.name=field.name;
+      if (field.children.length == 0) {
+        sourceArray.push(new RecommendationField(field));
+      }
+    });
+    return sourceArray;
+  }
   private createRecommendationRequest(): any {
     let sourceArtifactId = 'ndcshopping19.2';
     let sourceGroupId = 'cetai';
@@ -385,33 +399,33 @@ export class FileManagementService {
     //     });
     // }
 
-    var sourceArray:RecommendationField[] = [] ;
+    var sourceArray: RecommendationField[] = [];
 
-    this.cfg.sourceDocs[0].allFields.forEach(field => {
+    this.cfg.sourceDocs[0].allFields.forEach((field) => {
       // var tmpField:RecommendationField = { field.path,};
       // tmpField.path=field.path;
       // tmpField.name=field.name;
-      if(field.children.length == 0)
-      {
-        sourceArray.push( new RecommendationField(field));
+      if (field.children.length == 0) {
+        sourceArray.push(new RecommendationField(field));
       }
     });
 
+    var targetArray: RecommendationField[] = [];
 
-    var targetArray:RecommendationField[] = [] ;
-
-    this.cfg.targetDocs[0].allFields.forEach(field => {
-      targetArray.push( new RecommendationField(field));
+    this.cfg.targetDocs[0].allFields.forEach((field) => {
+      targetArray.push(new RecommendationField(field));
     });
 
-    console.log(' souce array count ' + this.cfg.sourceDocs[0].allFields.length);
+    console.log(
+      ' souce array count ' + this.cfg.sourceDocs[0].allFields.length
+    );
 
     console.log(' filtered souce array count' + sourceArray.length);
-    console.log( targetArray);
+    console.log(targetArray);
     return {
       RecommendationRequest: {
         sourceArtifactId: sourceArtifactId,
-        targetArtifactId̥: targetArtifactId,
+        targetArtifactId: targetArtifactId,
         mappingDefinitionId: this.cfg.mappingDefinitionId,
         sourceFields: sourceArray,
         targetFields: targetArray,
@@ -420,11 +434,16 @@ export class FileManagementService {
     };
   }
 
+  showSingleAIAtlasMapping(field: Field): void {
+    console.log('showSingleAIAtlasMapping in file service bittu ' + field);
+  }
+
   showAIAtlasMapping(): void {
     console.log('showAIAtlasMapping in file service bittu ');
     //  console.log({sampledata})
 
     const RecommendationRequest = this.createRecommendationRequest();
+    // const RecommendationRequest = this.createRecommRequestFieldArray();
     console.log(RecommendationRequest);
     this.getAIRecommendation(RecommendationRequest)
       .toPromise()

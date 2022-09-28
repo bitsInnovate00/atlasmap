@@ -28,11 +28,48 @@ public class RecommendationField implements Serializable {
     protected String name;
     protected String artifactId;
     protected String fieldType;
+    private Integer minLength;
+    private Integer maxLength;
+    private String dataFormat;
+    private String[] values;
+    //Need to derive from values column using Janusgraph master data api
+    private String[] derivedValueTypes;
+
+    private String businessContext;
+    //taxonomy terms extracted from documentation
+    private String[] docTerms;
+
+
 
     public RecommendationField ()
     {
 
     }
+
+
+    public Integer getMinLength() {
+        return minLength;
+    }
+
+
+
+    public void setMinLength(Integer minLength) {
+        this.minLength = minLength;
+    }
+
+
+
+    public Integer getMaxLength() {
+        return maxLength;
+    }
+
+
+
+    public void setMaxLength(Integer maxLength) {
+        this.maxLength = maxLength;
+    }
+
+
 
     public String getFieldPath() {
         return fieldPath;
@@ -66,10 +103,54 @@ public class RecommendationField implements Serializable {
         this.fieldType = fieldType;
     }
 
+
+
+    public String getDataFormat() {
+        return dataFormat;
+    }
+
+    public void setDataFormat(String dataFormat) {
+        this.dataFormat = dataFormat;
+    }
+
+    public String[] getValues() {
+        return values;
+    }
+
+    public void setValues(String[] values) {
+        this.values = values;
+    }
+
+    public String getBusinessContext() {
+        return businessContext;
+    }
+
+    public void setBusinessContext(String businessContext) {
+        this.businessContext = businessContext;
+    }
+
+    public String[] getDocTerms() {
+        return docTerms;
+    }
+
+    public void setDocTerms(String[] docTerms) {
+        this.docTerms = docTerms;
+    }
+
     @Override
     public String toString() {
         return "RecommendationField [artifactId=" + artifactId + ", fieldPath=" + fieldPath + ", fieldType=" + fieldType
                 + ", name=" + name + "]";
+    }
+
+
+    public String[] getDerivedValueTypes() {
+        return derivedValueTypes;
+    }
+
+
+    public void setDerivedValueTypes(String[] derivedValueTypes) {
+        this.derivedValueTypes = derivedValueTypes;
     }
 
 }

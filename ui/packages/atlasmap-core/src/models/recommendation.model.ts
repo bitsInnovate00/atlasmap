@@ -14,36 +14,23 @@
     limitations under the License.
 */
 
-import { Field } from ".";
+import { Field } from '.';
 
 export class RecommendationField {
-  path: string;
+  fieldPath: string;
   name: string;
-  type: string;
-  usercreated: boolean;
-  isArray: boolean;
-  isAttribute: boolean;
-  isCollection:  boolean;
-  isPrimitive: boolean;
-  namespaceAlias: string | null;
+  fieldType: string;
   artifactid: string;
 
   constructor(field: Field) {
-    this.path=field.path;
-    this.name=field.name;
-    this.type=field.type;
-    this.usercreated=field.userCreated;
-    this.isArray=field.isArray;
-    this.isAttribute=field.isAttribute;
-    this.isCollection=field.isCollection;
-    this.isPrimitive=field.isPrimitive;
-    this.namespaceAlias=field.namespaceAlias;
+    this.fieldPath = field.path;
+    this.name = field.name;
+    this.fieldType = field.type;
 
     // this._identifier = ErrorInfo.errorIdentifierCounter.toString();
     // ErrorInfo.errorIdentifierCounter++;
     // Object.assign(this, init);
   }
-  
 }
 
 export class RecommendationRequest {

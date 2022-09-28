@@ -1,0 +1,59 @@
+<soap:Envelope
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <ns2:AirAvailabilityRS
+            xmlns:ns2="http://www.ibsplc.com/iRes/simpleTypes/">
+            <OriginDestinationInfo Origin="FRA" Destination="AYT" SearchIndex="1" TripDirection="OW" IsPartOfRoundTrip="false" PricingUnitID="3">
+                <TripInfo TripIndex="1" Route="FRA-AYT">
+                    <SegmentInfo SegmentIndex="1" Stops="0" Status="OPEN" DayChange="0" JourneyTime="03:25" IsIropedInd="false">
+                        <FlightIdentifierInfo CarrierCode="V1" FlightNumber="141" FlightDate="2019-11-15Z" FlightSuffix="*"/>
+                        <DepartureInfo AirportCode="FRA" DateTime="2019-11-15T13:45:00Z" TimeZoneOffset="GMT+01:00"/>
+                        <ArrivalInfo AirportCode="AYT" DateTime="2019-11-15T19:10:00Z" TimeZoneOffset="GMT+03:00"/>
+                        <AircraftInfo Type="73H" Version="800"/>
+                        <DeiInfo IsExistInd="true" DisplayInd="false"/>
+                        <SegmentAvailability BookingClass="L" SeatAvailablity="-6" InventoryStatus="CC" CabinClass="ECONOMY"/>
+                    </SegmentInfo>
+                </TripInfo>
+                <TripInfo TripIndex="2" Route="FRA-AYT">
+                    <SegmentInfo SegmentIndex="2" Stops="0" Status="OPEN" DayChange="0" JourneyTime="03:25" IsIropedInd="false">
+                        <FlightIdentifierInfo CarrierCode="V1" FlightNumber="145" FlightDate="2019-11-15Z" FlightSuffix="*"/>
+                        <DepartureInfo AirportCode="FRA" DateTime="2019-11-15T17:40:00Z" TimeZoneOffset="GMT+01:00"/>
+                        <ArrivalInfo AirportCode="AYT" DateTime="2019-11-15T23:05:00Z" TimeZoneOffset="GMT+03:00"/>
+                        <AircraftInfo Type="73H" Version="800"/>
+                        <DeiInfo IsExistInd="true" DisplayInd="false"/>
+                        <SegmentAvailability BookingClass="L" SeatAvailablity="-16" InventoryStatus="CC" CabinClass="ECONOMY"/>
+                    </SegmentInfo>
+                </TripInfo>
+                <PricingInfo TripRefIndex="1">
+                    <PaxPricingInfo FareType="SUNECO" PaxType="ADULT">
+                        <DisplayFare Amount="76.99" CurrencyCode="EUR" DecimalPlaces="2"/>
+                        <Discount Amount="0.0" CurrencyCode="EUR" DecimalPlaces="2"/>
+                        <AppliedFare Amount="76.99" CurrencyCode="EUR" DecimalPlaces="2"/>
+                        <Tax Amount="0.0" CurrencyCode="EUR" DecimalPlaces="2"/>
+                        <Surcharge Amount="0.0" CurrencyCode="EUR" DecimalPlaces="2"/>
+                    </PaxPricingInfo>
+                    <PricingComponentInfo PricingComponentIndex="1" FareLevel="ST" FareBasis="LINT" FareType="SUNECO" IsReturnRestricted="false" FareId="318636">
+                        <PaxBaseFare Amount="18.67" CurrencyCode="EUR" DecimalPlaces="2" PaxType="ADULT"/>
+                        <SegmentLinkInfo SegmentRefIndex="1"/>
+                    </PricingComponentInfo>
+                    <SegmentReferenceInfo SegmentRefIndex="1" BookingClass="L"/>
+                </PricingInfo>
+                <PricingInfo TripRefIndex="2">
+                    <PaxPricingInfo FareType="SUNECO" PaxType="ADULT">
+                        <DisplayFare Amount="76.99" CurrencyCode="EUR" DecimalPlaces="2"/>
+                        <Discount Amount="0.0" CurrencyCode="EUR" DecimalPlaces="2"/>
+                        <AppliedFare Amount="76.99" CurrencyCode="EUR" DecimalPlaces="2"/>
+                        <Tax Amount="0.0" CurrencyCode="EUR" DecimalPlaces="2"/>
+                        <Surcharge Amount="0.0" CurrencyCode="EUR" DecimalPlaces="2"/>
+                    </PaxPricingInfo>
+                    <PricingComponentInfo PricingComponentIndex="20" FareLevel="ST" FareBasis="LINT" FareType="SUNECO" IsReturnRestricted="false" FareId="318636">
+                        <PaxBaseFare Amount="18.67" CurrencyCode="EUR" DecimalPlaces="2" PaxType="ADULT"/>
+                        <SegmentLinkInfo SegmentRefIndex="2"/>
+                    </PricingComponentInfo>
+                    <SegmentReferenceInfo SegmentRefIndex="2" BookingClass="L"/>
+                </PricingInfo>
+            </OriginDestinationInfo>
+            <IsFareRefreshRequired>false</IsFareRefreshRequired>
+        </ns2:AirAvailabilityRS>
+    </soap:Body>
+</soap:Envelope>

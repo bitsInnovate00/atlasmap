@@ -58,6 +58,7 @@ export interface ITargetsColumnCallbacks extends IPropertiesTreeCallbacks {
   onRemoveFromSelectedMapping: (field: IAtlasmapField) => void;
   canStartMapping: (field: IAtlasmapField) => boolean;
   onStartMapping: (field: IAtlasmapField) => void;
+  // singleFieldMapping: (field: IAtlasmapField) => void;
   shouldShowMappingPreviewForField: (field: IAtlasmapField) => boolean;
   onFieldPreviewChange: (field: IAtlasmapField, value: string) => void;
   canAddToSelectedMapping: (isSource: boolean) => boolean;
@@ -94,6 +95,7 @@ export const TargetsColumn: FunctionComponent<
   onRemoveFromSelectedMapping,
   canStartMapping,
   onStartMapping,
+  singleFieldMapping,
   onFieldPreviewChange,
   shouldShowMappingPreviewForField,
   targets,
@@ -188,6 +190,7 @@ export const TargetsColumn: FunctionComponent<
                       onRemoveFromSelectedMapping={onRemoveFromSelectedMapping}
                       canStartMapping={canStartMapping}
                       onStartMapping={onStartMapping}
+                      singleFieldMapping={singleFieldMapping}
                       fields={targetProperties.fields}
                       showTypes={showTypes}
                       renderPreview={renderPreview}
@@ -269,6 +272,8 @@ export const TargetsColumn: FunctionComponent<
                                 onRemoveFromSelectedMapping(field),
                               canStartMapping: canStartMapping(field),
                               onStartMapping: () => onStartMapping(field),
+                              singleFieldMapping: () =>
+                                singleFieldMapping(field),
                             })
                           }
                           renderPreview={(field) =>

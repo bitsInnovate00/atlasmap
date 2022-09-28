@@ -62,6 +62,7 @@ export interface ISourceColumnCallbacks
   canRemoveFromSelectedMapping: (source: IAtlasmapField) => boolean;
   canStartMapping: (field: IAtlasmapField) => boolean;
   onStartMapping: (field: IAtlasmapField) => void;
+  singleFieldMapping: (field: IAtlasmapField) => void;
   onRemoveFromSelectedMapping: (source: IAtlasmapField) => void;
   shouldShowMappingPreviewForField: (field: IAtlasmapField) => boolean;
   onFieldPreviewChange: (field: IAtlasmapField, value: string) => void;
@@ -102,6 +103,7 @@ export const SourcesColumn: FunctionComponent<
   onRemoveFromSelectedMapping,
   canStartMapping,
   onStartMapping,
+  singleFieldMapping,
   shouldShowMappingPreviewForField,
   onFieldPreviewChange,
   sourceProperties,
@@ -198,6 +200,7 @@ export const SourcesColumn: FunctionComponent<
                       onRemoveFromSelectedMapping={onRemoveFromSelectedMapping}
                       canStartMapping={canStartMapping}
                       onStartMapping={onStartMapping}
+                      singleFieldMapping={singleFieldMapping}
                       fields={sourceProperties.fields}
                       showTypes={showTypes}
                       renderPreview={renderPreview}
@@ -253,6 +256,7 @@ export const SourcesColumn: FunctionComponent<
                       onRemoveFromSelectedMapping={onRemoveFromSelectedMapping}
                       canStartMapping={canStartMapping}
                       onStartMapping={onStartMapping}
+                      singleFieldMapping={singleFieldMapping}
                       fields={constants.fields}
                       renderPreview={renderPreview}
                     />
@@ -333,6 +337,8 @@ export const SourcesColumn: FunctionComponent<
                                 onRemoveFromSelectedMapping(field),
                               canStartMapping: canStartMapping(field),
                               onStartMapping: () => onStartMapping(field),
+                              singleFieldMapping: () =>
+                                singleFieldMapping(field),
                             })
                           }
                           renderPreview={renderPreview}

@@ -14,10 +14,12 @@ import {
   LinkIcon,
   ProjectDiagramIcon,
   UnlinkIcon,
+  BrainIcon,
 } from "@patternfly/react-icons";
 
 import { AutoDropdown } from "../../../UI";
 import { IAtlasmapMapping } from "../../../Views";
+import { Field } from "@atlasmap/core";
 
 export interface ICommonActionsProps {
   connectedMappings: IAtlasmapMapping[];
@@ -28,6 +30,7 @@ export interface ICommonActionsProps {
   onRemoveFromSelectedMapping: () => void;
   canStartMapping: boolean;
   onStartMapping: () => void;
+  singleFieldMapping: (field: Field) => void;
 }
 
 export function commonActions({
@@ -39,6 +42,7 @@ export function commonActions({
   onRemoveFromSelectedMapping,
   canStartMapping,
   onStartMapping,
+  singleFieldMapping,
 }: ICommonActionsProps) {
   return [
     <Tooltip
@@ -144,8 +148,27 @@ export function commonActions({
         isDisabled={!canStartMapping}
         data-testid={"create-new-mapping-button"}
       >
+
         <ProjectDiagramIcon />
       </Button>
     </Tooltip>,
+    <Tooltip
+    key={"add"}
+    position={"top"}
+    enableFlip={true}
+    content={<div>Show single AI Field Mapping</div>}
+  >
+    <Button
+      variant="plain"
+      onClick={singleFieldMapping}
+      aria-label={"Show single AI Field Mapping"}
+      tabIndex={0}
+      // isDisabled={!canStartMapping}
+      data-testid={"create-new-mapping-button"}
+    >
+
+      <BrainIcon />
+    </Button>
+  </Tooltip>,
   ];
 }
