@@ -17,9 +17,6 @@ package io.atlasmap.v2;
 
 import java.io.Serializable;
 
-import com.fasterxml.jackson.annotation.JsonRootName;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 // @JsonRootName("RecommendationField")
 // @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS, property = "jsonType")
 public class RecommendationField implements Serializable {
@@ -39,11 +36,37 @@ public class RecommendationField implements Serializable {
     //taxonomy terms extracted from documentation
     private String[] docTerms;
 
+    private double score;
+
+    private boolean isLeafNode;
+
+    private int hierarchyDepth;
+
 
 
     public RecommendationField ()
     {
 
+    }
+
+
+    public boolean isLeafNode() {
+        return isLeafNode;
+    }
+
+
+    public void setLeafNode(boolean isLeafNode) {
+        this.isLeafNode = isLeafNode;
+    }
+
+
+    public int getHierarchyDepth() {
+        return hierarchyDepth;
+    }
+
+
+    public void setHierarchyDepth(int hierarchyDepth) {
+        this.hierarchyDepth = hierarchyDepth;
     }
 
 
@@ -152,5 +175,17 @@ public class RecommendationField implements Serializable {
     public void setDerivedValueTypes(String[] derivedValueTypes) {
         this.derivedValueTypes = derivedValueTypes;
     }
+
+
+    public double getScore() {
+        return score;
+    }
+
+
+    public void setScore(double score) {
+        this.score = score;
+    }
+
+    
 
 }
