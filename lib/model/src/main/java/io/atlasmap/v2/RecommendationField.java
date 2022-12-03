@@ -20,7 +20,8 @@ import java.io.Serializable;
 // @JsonRootName("RecommendationField")
 // @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS, property = "jsonType")
 public class RecommendationField implements Serializable {
-
+    
+    protected Long nativeFieldId;
     protected String fieldPath;
     protected String name;
     protected String artifactId;
@@ -184,6 +185,58 @@ public class RecommendationField implements Serializable {
 
     public void setScore(double score) {
         this.score = score;
+    }
+
+
+    
+
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((nativeFieldId == null) ? 0 : nativeFieldId.hashCode());
+        result = prime * result + ((fieldPath == null) ? 0 : fieldPath.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        return result;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        RecommendationField other = (RecommendationField) obj;
+        if (nativeFieldId == null) {
+            if (other.nativeFieldId != null)
+                return false;
+        } else if (!nativeFieldId.equals(other.nativeFieldId))
+            return false;
+        if (fieldPath == null) {
+            if (other.fieldPath != null)
+                return false;
+        } else if (!fieldPath.equals(other.fieldPath))
+            return false;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
+            return false;
+        return true;
+    }
+
+
+    public Long getNativeFieldId() {
+        return nativeFieldId;
+    }
+
+
+    public void setNativeFieldId(Long nativeFieldId) {
+        this.nativeFieldId = nativeFieldId;
     }
 
     
