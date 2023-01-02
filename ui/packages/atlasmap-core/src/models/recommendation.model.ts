@@ -14,36 +14,40 @@
     limitations under the License.
 */
 
-import { Field } from ".";
+import { Field } from '.';
 
 export class RecommendationField {
-  path: string;
+  nativeFieldId: string;
+  fieldPath: string;
   name: string;
-  type: string;
-  usercreated: boolean;
-  isArray: boolean;
-  isAttribute: boolean;
-  isCollection:  boolean;
-  isPrimitive: boolean;
-  namespaceAlias: string | null;
-  artifactid: string;
+  fieldType: string;
+  minLength: number;
+  maxLength: number;
+  dataFormat: string;
+  leafNode: boolean;
+  hierarchyDepth: number;
+  // usercreated: boolean;
+  // isArray: boolean;
+  // isAttribute: boolean;
+  // isCollection: boolean;
+  // isPrimitive: boolean;
+  // namespaceAlias: string | null;
+  // artifactid: string;
 
   constructor(field: Field) {
-    this.path=field.path;
-    this.name=field.name;
-    this.type=field.type;
-    this.usercreated=field.userCreated;
-    this.isArray=field.isArray;
-    this.isAttribute=field.isAttribute;
-    this.isCollection=field.isCollection;
-    this.isPrimitive=field.isPrimitive;
-    this.namespaceAlias=field.namespaceAlias;
+    this.fieldPath = field.path;
+    this.name = field.name;
+    this.fieldType = field.type;
+    this.nativeFieldId = field.uuid;
+    this.minLength = -1;
+    this.maxLength = 1;
+    this.leafNode = field.isTerminal();
+    this.hierarchyDepth = field.fieldDepth;
 
     // this._identifier = ErrorInfo.errorIdentifierCounter.toString();
     // ErrorInfo.errorIdentifierCounter++;
     // Object.assign(this, init);
   }
-  
 }
 
 export class RecommendationRequest {

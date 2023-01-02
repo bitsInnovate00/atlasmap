@@ -474,33 +474,35 @@ export class FileManagementService {
     //     });
     // }
 
-    var sourceArray:RecommendationField[] = [] ;
+    var sourceArray: RecommendationField[] = [];
 
-    this.cfg.sourceDocs[0].allFields.forEach(field => {
+    this.cfg.sourceDocs[0].allFields.forEach((field) => {
       // var tmpField:RecommendationField = { field.path,};
       // tmpField.path=field.path;
       // tmpField.name=field.name;
-      if(field.children.length == 0)
-      {
-        sourceArray.push( new RecommendationField(field));
+      if (field.children.length == 0) {
+        sourceArray.push(new RecommendationField(field));
       }
     });
 
+    var targetArray: RecommendationField[] = [];
 
-    var targetArray:RecommendationField[] = [] ;
-
-    this.cfg.targetDocs[0].allFields.forEach(field => {
-      targetArray.push( new RecommendationField(field));
+    this.cfg.targetDocs[0].allFields.forEach((field) => {
+      if (field.children.length == 0) {
+        targetArray.push(new RecommendationField(field));
+      }
     });
 
-    console.log(' souce array count ' + this.cfg.sourceDocs[0].allFields.length);
+    console.log(
+      ' souce array count ' + this.cfg.sourceDocs[0].allFields.length
+    );
 
     console.log(' filtered souce array count' + sourceArray.length);
-    console.log( targetArray);
+    console.log(targetArray);
     return {
       RecommendationRequest: {
         sourceArtifactId: sourceArtifactId,
-        targetArtifactId̥: targetArtifactId,
+        targetArtifactId: targetArtifactId,
         mappingDefinitionId: this.cfg.mappingDefinitionId,
         sourceFields: sourceArray,
         targetFields: targetArray,
