@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.atlasmap.api.AtlasContext;
 import io.atlasmap.api.AtlasContextFactory;
@@ -114,7 +115,7 @@ public class AtlasService {
         else {
             baseFolder = "target";
         }
-        // mappingFol̥der = baseFolder + File.separator + "mappings";
+        mappingFolder = baseFolder + File.separator + "mappings";
         libFolder = baseFolder + File.separator + "lib";
 
         this.libraryLoader = new AtlasLibraryLoader(libFolder);
@@ -163,19 +164,29 @@ public class AtlasService {
       public Response listAIAtlasMappings(InputStream inputStream) throws AtlasException{
   
         RecommendationRequest recommendationRequest = fromJson(inputStream, RecommendationRequest.class);
-          System.out.println(" The input mapping as json " + recommendationRequest);
-         Client client= ClientBuilder.newBuilder().build();
-         WebTarget target = client.target("http://192.168.153.165:9999/aimapper");
-         Recommendation recommendations=target.request(MediaType.APPLICATION_JSON).post(Entity.json(recommendationRequest), Recommendation.class);
-         client.close();
+          System.out.println(" The input mapping as json1 " + recommendationRequest);
+        //  Client client= ClientBuilder.newBuilder().build();
+        //  WebTarget target = client.target("http://localhost:9999/fieldmapping");
+        //  Recommendation recommendations=target.request(MediaType.APPLICATION_JSON).post(Entity.json(recommendationRequest), Recommendation.class);
+        //  client.close();
+         ObjectMapper mapper=new ObjectMapper();
+         Recommendation recommendations=null;
+        try {
+            recommendations = mapper.readValue(new File("/home/bittu/work/cetai-org/atlasmap/lib/service/recommendation.json"), Recommendation.class);
+        } catch (IOException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
          System.out.println(" Recommendations are "+ recommendations);
          ADMArchiveHandler admHandler = loadExplodedMappingDirectory(recommendationRequest.getMappingDefinitionId());
         AtlasMapping mapping = admHandler.getMappingDefinition();
         AtlasContext context = atlasContextFactory.createContext(mapping);
         AtlasSession session = context.createSession();
         System.out.println("session details " + session.getDefaultSourceDocument());
-        
-        RecommendationToAtlasAdapter.covertMapping(mapping, recommendations);
+        // Recommendation ndcRecommendation=RecommendationToAtlasAdapter.convertNDCMapping(recommendations,recommendationRequest.getTargetFields());
+        RecommendationToAtlasAdapter.covertMapping(mapping, recommendations,recommendationRequest.getSourceFields(),recommendationRequest.getTargetFields());
+        admHandler.setMappingDefinition(mapping);
+        admHandler.persist();
         byte[] serialized = null;
             try {
                 serialized = admHandler.getMappingDefinitionBytes();
@@ -190,6 +201,9 @@ public class AtlasService {
                 LOG.debug("Mapping definition not found for ID:{}", recommendationRequest.getMappingDefinitionId());
                 return Response.noContent().build();
             }
+
+            
+
             return Response.ok().entity(serialized).build();
       
         //   ResteasyClient client = new ResteasyClientBuilder().build();
