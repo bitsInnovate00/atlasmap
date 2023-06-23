@@ -1,0 +1,108 @@
+{
+    "AtlasMapping" : {
+      "jsonType" : "io.atlasmap.v2.AtlasMapping",
+      "dataSource" : [ {
+        "jsonType" : "io.atlasmap.xml.v2.XmlDataSource",
+        "id" : "iFlyRes_AirShoppingRS-atlas-9acff547-b60a-4507-8920-090488c7d368",
+        "name" : "iFlyRes_AirShoppingRS-atlas",
+        "description" : "Source document iFlyRes_AirShoppingRS-atlas type: XSD",
+        "uri" : "atlas:xml:iFlyRes_AirShoppingRS-atlas-9acff547-b60a-4507-8920-090488c7d368",
+        "dataSourceType" : "SOURCE",
+        "xmlNamespaces" : {
+          "xmlNamespace" : [ {
+            "alias" : "dsig",
+            "uri" : "http://www.w3.org/2000/09/xmldsig#"
+          }, {
+            "alias" : "tns",
+            "uri" : "http://www.ibsplc.com/iRes/simpleTypes/"
+          }, {
+            "alias" : "cns",
+            "uri" : "http://www.iata.org/IATA/2015/EASD/00/IATA_OffersAndOrdersCommonTypes"
+          } ]
+        }
+      }, {
+        "jsonType" : "io.atlasmap.xml.v2.XmlDataSource",
+        "id" : "IATA_AirShoppingRS-213-2c49a12b-3f18-4d89-bcb2-ac286c94e0ad",
+        "name" : "IATA_AirShoppingRS-213",
+        "description" : "Target document IATA_AirShoppingRS-213 type: XSD",
+        "uri" : "atlas:xml:IATA_AirShoppingRS-213-2c49a12b-3f18-4d89-bcb2-ac286c94e0ad",
+        "dataSourceType" : "TARGET",
+        "xmlNamespaces" : {
+          "xmlNamespace" : [ {
+            "alias" : "tns",
+            "uri" : "http://www.iata.org/IATA/2015/EASD/00/IATA_OffersAndOrdersMessage"
+          } ]
+        }
+      } ],
+      "mappings" : {
+        "mapping" : [ 
+          {
+          "jsonType" : "io.atlasmap.v2.Mapping",
+          "inputFieldGroup" : {
+            "jsonType" : "io.atlasmap.v2.FieldGroup",
+            "actions" : [ ],
+            "field" : [ {
+              "jsonType" : "io.atlasmap.xml.v2.XmlField",
+              "docId" : "iFlyRes_AirShoppingRS-atlas-9acff547-b60a-4507-8920-090488c7d368",
+              "path" : "/tns:AirAvailabilityRS/OriginDestinationInfo<>/TripInfo<>/SegmentInfo<>/ArrivalInfo/@DateTime",
+              "fieldType" : "DATE_TIME",
+              "name" : "DateTime",
+              "userCreated" : false,
+              "attribute" : true
+            } ]
+          },
+          "inputField" : [ ],
+          "outputField" : [ {
+            "jsonType" : "io.atlasmap.xml.v2.XmlField",
+            "docId" : "IATA_AirShoppingRS-213-2c49a12b-3f18-4d89-bcb2-ac286c94e0ad",
+            "path" : "/tns:IATA_AirShoppingRS/tns:Response/tns:DataLists/tns:DatedMarketingSegmentList/tns:DatedMarketingSegment<>/tns:Arrival/tns:AircraftScheduledDateTime",
+            "fieldType" : "DATE_TIME",
+            "name" : "AircraftScheduledDateTime",
+            "userCreated" : false,
+            "attribute" : false
+          } ],
+          "id" : "mapping.211252"
+        } ,
+        {
+          "jsonType" : "io.atlasmap.v2.Mapping",
+          "inputFieldGroup" : {
+            "jsonType" : "io.atlasmap.v2.FieldGroup",
+            "actions" : [ ],
+            "field" : [ {
+              "jsonType" : "io.atlasmap.xml.v2.XmlField",
+              "docId" : "iFlyRes_AirShoppingRS-atlas-9acff547-b60a-4507-8920-090488c7d368",
+              "path" : "/tns:AirAvailabilityRS/OriginDestinationInfo<>/TripInfo<>/SegmentInfo<>/ArrivalInfo/@AirportCode",
+              "fieldType" : "STRING",
+              "name" : "AirportCode",
+              "userCreated" : false,
+              "attribute" : true
+            } ]
+          },
+          "inputField" : [ ],
+          "outputField" : [ {
+            "jsonType" : "io.atlasmap.xml.v2.XmlField",
+            "docId" : "IATA_AirShoppingRS-213-2c49a12b-3f18-4d89-bcb2-ac286c94e0ad",
+            "path" : "/tns:IATA_AirShoppingRS/tns:Response/tns:DataLists/tns:DatedMarketingSegmentList/tns:DatedMarketingSegment<>/tns:Arrival/tns:BoardingGateID",
+            "name" : "BoardingGateID",
+            "userCreated" : false,
+            "attribute" : false
+          } ],
+          "id" : "mapping.322296"
+        },
+        {
+          "jsonType" : "io.atlasmap.v2.CustomMapping",
+          "className" : "io.atlasmap.itests.core.MappingBuilderTest$JsonXmlBuilder"
+        } ]
+      },
+      "lookupTables" : {
+        "lookupTable" : [ ]
+      },
+      "constants" : {
+        "constant" : [ ]
+      },
+      "properties" : {
+        "property" : [ ]
+      },
+      "name" : "UI.0"
+    }
+  }

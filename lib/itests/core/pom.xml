@@ -30,9 +30,42 @@
 
   <properties>
     <osgi.export.pkg>io.atlasmap.itests.core</osgi.export.pkg>
+    <drools-version>7.41.0.Final</drools-version>
   </properties>
 
+<dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-bom</artifactId>
+        <type>pom</type>
+        <version>${drools-version}</version>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
+   <dependency>
+            <groupId>org.kie</groupId>
+            <artifactId>kie-api</artifactId>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+      
+        <dependency>
+            <groupId>org.drools</groupId>
+            <artifactId>drools-core</artifactId>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+
+   <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-compiler</artifactId>
+        <scope>test</scope>
+      </dependency>
+
     <dependency>
       <groupId>io.atlasmap</groupId>
       <artifactId>atlas-model</artifactId>
@@ -114,5 +147,26 @@
       <artifactId>xmlunit-matchers</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.ibsplc.ires</groupId>
+      <artifactId>ires-shopping-rs</artifactId>
+      <version>1.0</version>
+     <scope>system</scope>
+     <systemPath>/home/bittu/work/cetai-org/cetai/utils/ndc-java-sdk/ires-native-jaxb/ires-rs-model-1.0.jar</systemPath>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      
+      <plugin>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-maven-plugin</artifactId>
+        <version>${drools-version}</version>
+        <extensions>true</extensions>
+      </plugin>
+    </plugins>
+
+  </build>
+
 </project>

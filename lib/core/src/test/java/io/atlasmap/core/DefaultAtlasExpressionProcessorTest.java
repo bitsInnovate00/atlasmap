@@ -134,7 +134,7 @@ public class DefaultAtlasExpressionProcessorTest extends BaseDefaultAtlasContext
 
     @Test
     public void testFilterSelect() throws Exception {
-        FieldGroup source = populateComplexCollectionSourceField(null, AtlasConstants.DEFAULT_SOURCE_DOCUMENT_ID, "foo");
+        FieldGroup source = populateComplexNestedCollectionSourceField(null, AtlasConstants.DEFAULT_SOURCE_DOCUMENT_ID, "foo");
         String expression = String.format(
             "SELECT(FILTER(${%s:/testPathfoo<>}, ${/value} != 'foo1'), ${/value})",
             AtlasConstants.DEFAULT_SOURCE_DOCUMENT_ID, AtlasConstants.DEFAULT_SOURCE_DOCUMENT_ID);

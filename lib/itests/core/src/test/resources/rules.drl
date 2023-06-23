@@ -1,0 +1,12 @@
+
+package ndc;
+
+import com.ibsplc.iRes.shoppingrs.AirAvailabilityRS
+import com.ibsplc.iRes.shoppingrs.OriginDestinationInfo
+rule "Check Origin Configuration"
+  when
+  $server : OriginDestinationInfo( origin != null )
+  then
+  $server.setOrigin("hello");
+  System.out.println("OriginCode  "+ $server.getOrigin() + " configuration does not meet requirements!");
+end

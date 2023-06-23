@@ -252,6 +252,66 @@ public abstract class BaseDefaultAtlasContextTest {
         return fieldGroup;
     }
 
+    protected FieldGroup populateComplexNestedCollectionSourceField(Mapping mapping, String docId, String seed) {
+        String basePath = "/testPath" + seed;
+        FieldGroup fieldGroup = new FieldGroup();
+        fieldGroup.setFieldType(FieldType.COMPLEX);
+        fieldGroup.setDocId(docId);
+        fieldGroup.setPath(basePath + "<>");
+        if (mapping != null) {
+            mapping.setInputFieldGroup(fieldGroup);
+        }
+        List<Field> terminals = new ArrayList<>();
+        for (int i=0; i<10; i++) {
+            FieldGroup child = new FieldGroup();
+            child.setFieldType(FieldType.COMPLEX);
+            child.setDocId(docId);
+            child.setPath(basePath + "<" + i + ">");
+            child.setIndex(i);
+            addChildFieldGroup(child,basePath + "<" + i + ">",docId);
+            Field terminal = new SimpleField();
+            terminal.setFieldType(FieldType.STRING);
+            terminal.setDocId(docId);
+            terminal.setPath(basePath + "<" + i + ">/value");
+            terminal.setValue(seed + i);
+            child.getField().add(terminal);
+            reader.sources.put(terminal.getPath(), terminal.getValue());
+            fieldGroup.getField().add(child);
+            reader.sources.put(child.getPath(), child);
+            reader.sources.put(terminal.getPath(), terminal);
+            terminals.add(terminal);
+        }
+        reader.sources.put(fieldGroup.getPath(), fieldGroup);
+        FieldGroup valueGroup = AtlasModelFactory.copyFieldGroup(fieldGroup);
+        valueGroup.getField().addAll(terminals);
+        valueGroup.setPath(fieldGroup.getPath() + "/value");
+        reader.sources.put(valueGroup.getPath(), valueGroup);
+        return fieldGroup;
+    }
+
+    private void addChildFieldGroup(FieldGroup parent, String basePath, String docId) {
+
+        for(int i=0;i<5;i++)
+        {
+            FieldGroup child = new FieldGroup();
+            child.setFieldType(FieldType.COMPLEX);
+            child.setDocId(docId);
+            String childPath=basePath +"/child"+ "<" + i + ">";
+            child.setPath(childPath);
+            child.setIndex(i);
+            Field terminal = new SimpleField();
+            terminal.setFieldType(FieldType.STRING);
+            terminal.setDocId(docId);
+            terminal.setPath(childPath + "<" + i + ">/value");
+            terminal.setValue("child" + i);
+            child.getField().add(terminal);
+            parent.getField().add(child);
+            
+        }
+       
+        
+    }
+
     protected Field populateUnsupportedSourceField(Mapping mapping, String value, int index) {
         return populateUnsupportedSourceField(mapping, null, value, index);
     }

@@ -119,4 +119,8 @@ public interface AtlasModule {
 
     Field createField();
 
+    default Object unwrap(Object value,Class clazz,String contextPath) {
+        return null;
+    }
+
 }

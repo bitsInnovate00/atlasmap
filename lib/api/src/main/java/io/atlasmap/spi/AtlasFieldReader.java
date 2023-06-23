@@ -22,4 +22,8 @@ public interface AtlasFieldReader {
 
     Field read(AtlasInternalSession session) throws AtlasException;
 
+    default <T> T unwrap(AtlasInternalSession session) {
+        return null;
+    }
+
 }

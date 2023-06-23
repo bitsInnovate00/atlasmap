@@ -23,10 +23,33 @@
         }
       } ],
     "mappings" : {
-      "mapping" : [ {
-        "jsonType" : "io.atlasmap.v2.CustomMapping",
-        "className" : "io.atlasmap.itests.core.MappingBuilderTest$JsonXmlBuilder"
-      } ]
+      "mapping" : [ 
+        {
+          "jsonType" : "io.atlasmap.v2.Mapping",
+          "inputField" : [ {
+            "jsonType" : "io.atlasmap.json.v2.JsonField",
+            "docId" : "SourceJson",
+            "path" : "/sourceOrderList/numberOrders",
+            "fieldType" : "INTEGER",
+            "name" : "numberOrders"
+          } ],
+          "outputField" : [ {
+            "jsonType" : "io.atlasmap.xml.v2.XmlField",
+            "docId" : "TargetXml",
+            "path" : "/foo/bar/hello",
+            "fieldType" : "STRING",
+            "name" : "test",
+            "userCreated" : false,
+            "attribute" : false
+          } ],
+          "id" : "mapping.820641"
+        },
+        {
+          "jsonType" : "io.atlasmap.v2.CustomMapping",
+          "className" : "io.atlasmap.itests.core.MappingBuilderTest$JsonXmlBuilder"
+        } 
+        
+    ]
     },
     "lookupTables" : {
       "lookupTable" : [ ]

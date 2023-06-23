@@ -67,7 +67,19 @@ public class XmlFieldReader extends XmlFieldTransformer implements AtlasFieldRea
         this.conversionService = conversionService;
     }
 
+    // public <T> T unwrap(Object value, Class clazz)
+    // {
+        
+    //     XMLStreamReader streamReader= xmlHelper.writeDocumentToStreamReader((Node) value);
+    //     XmlMapper xmlMapper = new XmlMapper();
+    //     SimpleBean value = xmlMapper.readValue(file, SimpleBean.class);
+
+    //     xmlHelper.writeDocumentToStreamReader(document)
+    //     return null;
+    // }
+
     public Field read(AtlasInternalSession session) throws AtlasException {
+        
         Field field = session.head().getSourceField();
         if (document == null) {
             AtlasUtil.addAudit(session, field,
@@ -93,9 +105,29 @@ public class XmlFieldReader extends XmlFieldTransformer implements AtlasFieldRea
         XmlPath path = new XmlPath(field.getPath());
         List<Field> fields = getFieldsForPath(session, xmlNamespaces, document.getDocumentElement(), field, path, 0);
 
-        if (path.hasCollection() && !path.isIndexedCollection()) {
+        if (path.hasCollection() ) {
             FieldGroup fieldGroup = AtlasModelFactory.createFieldGroupFrom(field, true);
             fieldGroup.getField().addAll(fields);
+
+            // XPath xpath = XPathFactory.newInstance().newXPath();
+            //     // xpath.setNamespaceContext(this.namespaceContext);
+            //     NodeList subSchemas=null;
+            //     try {
+            //         subSchemas = (NodeList) xpath
+            //                 .evaluate(field.getPath(), document.getDocumentElement(), XPathConstants.NODESET);
+            //     } catch (XPathExpressionException e) {
+            //         // TODO Auto-generated catch block
+            //         e.printStackTrace();
+            //     }
+            //     for (int i = 0; i < subSchemas.getLength(); i++) {
+            //         Element e = (Element) subSchemas.item(i);
+            //         System.out.println(" Element value "+e);
+            //         // inheritNamespaces(e, false);
+            //         // callback.addSchema(e);
+            //     }
+
+                
+            fieldGroup.setValue(document.getDocumentElement());
             session.head().setSourceField(fieldGroup);
             return fieldGroup;
         } else if (fields.size() == 1) {
@@ -206,6 +238,8 @@ public class XmlFieldReader extends XmlFieldTransformer implements AtlasFieldRea
                     itemPath.setCollectionIndex(depth + 1, i);
                     itemField.setPath(itemPath.toString());
                  }
+                 if(FieldType.COMPLEX.equals(itemField.getFieldType()))
+                    itemField.setFieldType(FieldType.STRING);
                 List<Field> arrayFields = getFieldsForPath(
                     session, xmlNamespaces, children.get(i), itemField, new XmlPath(itemField.getPath()), depth + 1);
                 fields.addAll(arrayFields);
@@ -266,7 +300,12 @@ public class XmlFieldReader extends XmlFieldTransformer implements AtlasFieldRea
         if (xmlField.getFieldType() == null) {
             xmlField.setFieldType(FieldType.STRING);
         }
-
+        AtlasPath atlasPath=new AtlasPath(xmlField.getPath());
+        if(atlasPath.isIndexedCollection())
+        {
+            xmlField.setValue(node);
+            return;
+        }
         String value;
         if (sc.isAttribute()) {
             if (sc.getNamespace() != null && !sc.getNamespace().isEmpty()) {

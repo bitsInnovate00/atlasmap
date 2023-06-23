@@ -16,11 +16,16 @@
 package io.atlasmap.xml.module;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.XMLConstants;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -28,7 +33,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.sun.xml.xsom.XSElementDecl;
 import com.sun.xml.xsom.XSSchemaSet;
 
@@ -69,10 +80,65 @@ public class XmlModule extends BaseAtlasModule {
 
     private XmlIOHelper ioHelper;
 
+    private Map<String, JAXBContext> contextCache = new HashMap<>();
+
     @Override
     public void init() throws AtlasException {
         super.init();
         this.ioHelper = new XmlIOHelper(this.getClassLoader());
+    }
+
+    @Override
+    public Object unwrap(Object value, Class clazz, String contextPath) {
+        Object returnValue = null;
+        try {
+            JAXBContext jaxbContext = null;
+            if (contextCache.get(contextPath) != null) {
+                jaxbContext = contextCache.get(contextPath);
+            } else {
+
+                jaxbContext = JAXBContext.newInstance(contextPath);
+                contextCache.put(contextPath, jaxbContext);
+            }
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+            // Overloaded methods to unmarshal from different xml sources
+            JAXBElement element = jaxbUnmarshaller.unmarshal((Node) value, clazz);
+            returnValue = element.getValue();
+
+            // XmlFieldReader reader = new XmlFieldReader(getClassLoader(),
+            // getConversionService());
+
+            // XMLStreamReader streamReader = ioHelper.writeDocumentToStreamReader((Node)
+            // value);
+            // XmlMapper xmlMapper = new XmlMapper();//getXmlMapper();
+            // JaxbAnnotationModule module = new JaxbAnnotationModule();
+            // xmlMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+            // false);
+            // xmlMapper.registerModule(module);
+            // returnValue = xmlMapper.readValue(streamReader, clazz);
+        } catch (JAXBException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return returnValue;
+    }
+
+    protected XmlMapper getXmlMapper() {
+        final XmlMapper xmlMapper = new XmlMapper();
+
+        xmlMapper.addHandler(new DeserializationProblemHandler() {
+            @Override
+            public boolean handleUnknownProperty(final DeserializationContext ctxt, final JsonParser jp,
+                    final com.fasterxml.jackson.databind.JsonDeserializer<?> deserializer,
+                    final Object beanOrClass, final String propertyName)
+                    throws IOException, JsonProcessingException {
+                // skip any unknown property
+                // ctxt.getParser().skipChildren();
+                return true;
+            }
+        });
+        return xmlMapper;
     }
 
     @Override
@@ -95,7 +161,8 @@ public class XmlModule extends BaseAtlasModule {
     }
 
     protected XmlValidationService createValidationService() {
-        XmlValidationService xmlValidationService = new XmlValidationService(getConversionService(), getFieldActionService());
+        XmlValidationService xmlValidationService = new XmlValidationService(getConversionService(),
+                getFieldActionService());
         xmlValidationService.setMode(getMode());
         xmlValidationService.setDocId(getDocId());
         return xmlValidationService;
@@ -133,7 +200,9 @@ public class XmlModule extends BaseAtlasModule {
 
     /**
      * Convert a source document into XML. The modules extending this class can
-     * override this to convert some format into XML so that XML field reader can read it.
+     * override this to convert some format into XML so that XML field reader can
+     * read it.
+     * 
      * @param source some document which can be converted to XML
      * @return converted
      */
@@ -205,7 +274,7 @@ public class XmlModule extends BaseAtlasModule {
         Field targetField = session.head().getTargetField();
         XmlPath path = new XmlPath(targetField.getPath());
         FieldGroup targetFieldGroup = null;
-        if (path.hasCollection() && !path.isIndexedCollection()) {
+        if (path.hasCollection() ) {
             targetFieldGroup = AtlasModelFactory.createFieldGroupFrom(targetField, true);
             session.head().setTargetField(targetFieldGroup);
         }
@@ -217,7 +286,7 @@ public class XmlModule extends BaseAtlasModule {
 
         if (targetFieldGroup == null) {
             if (sourceField instanceof FieldGroup) {
-                List<Field> subFields = ((FieldGroup)sourceField).getField();
+                List<Field> subFields = ((FieldGroup) sourceField).getField();
                 if (subFields != null && subFields.size() > 0) {
                     Integer index = targetField.getIndex();
                     if (index != null) {
@@ -240,15 +309,17 @@ public class XmlModule extends BaseAtlasModule {
             super.populateTargetField(session);
         } else if (sourceField instanceof FieldGroup) {
             Field previousTargetSubField = null;
-            for (int i=0; i<((FieldGroup)sourceField).getField().size(); i++) {
-                Field sourceSubField = ((FieldGroup)sourceField).getField().get(i);
+            for (int i = 0; i < ((FieldGroup) sourceField).getField().size(); i++) {
+                Field sourceSubField = ((FieldGroup) sourceField).getField().get(i);
                 XmlField targetSubField = new XmlField();
                 AtlasXmlModelFactory.copyField(targetField, targetSubField, false);
-                getCollectionHelper().copyCollectionIndexes(sourceField, sourceSubField, targetSubField, previousTargetSubField);
+                getCollectionHelper().copyCollectionIndexes(sourceField, sourceSubField, targetSubField,
+                        previousTargetSubField);
                 previousTargetSubField = targetSubField;
                 // Attempt to Auto-detect field type based on input value
                 if (targetSubField.getFieldType() == null && sourceSubField.getValue() != null) {
-                    targetSubField.setFieldType(getConversionService().fieldTypeFromClass(sourceSubField.getValue().getClass()));
+                    targetSubField.setFieldType(
+                            getConversionService().fieldTypeFromClass(sourceSubField.getValue().getClass()));
                 }
                 targetFieldGroup.getField().add(targetSubField);
                 session.head().setSourceField(sourceSubField);
@@ -327,8 +398,11 @@ public class XmlModule extends BaseAtlasModule {
     }
 
     /**
-     * Convert a target XML document into some format. The modules extending this class can
-     * override this to convert interim XML document written by XML field writer into final format.
+     * Convert a target XML document into some format. The modules extending this
+     * class can
+     * override this to convert interim XML document written by XML field writer
+     * into final format.
+     * 
      * @param xml XML document written by XML field writer
      * @return converted
      */
@@ -346,7 +420,7 @@ public class XmlModule extends BaseAtlasModule {
 
     @Override
     public Field cloneField(Field field) throws AtlasException {
-        return AtlasXmlModelFactory.cloneField((XmlField)field, true);
+        return AtlasXmlModelFactory.cloneField((XmlField) field, true);
     }
 
     @Override
@@ -360,7 +434,8 @@ public class XmlModule extends BaseAtlasModule {
 
     private Document enforceSchema(Document doc) {
         if (getDataSourceMetadata() == null || getDataSourceMetadata().getInspectionType() != InspectionType.SCHEMA
-            || getDataSourceMetadata().getSpecification() == null || getDataSourceMetadata().getSpecification().length == 0) {
+                || getDataSourceMetadata().getSpecification() == null
+                || getDataSourceMetadata().getSpecification().length == 0) {
             return doc;
         }
         try {

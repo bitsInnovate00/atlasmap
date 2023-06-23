@@ -15,9 +15,11 @@
  */
 package io.atlasmap.builder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.atlasmap.api.AtlasException;
+import io.atlasmap.core.AtlasPath;
 import io.atlasmap.core.ConstantModule;
 import io.atlasmap.core.DefaultAtlasConversionService;
 import io.atlasmap.core.DefaultAtlasFieldActionService;
@@ -28,13 +30,19 @@ import io.atlasmap.spi.AtlasModule;
 import io.atlasmap.spi.AtlasModuleMode;
 import io.atlasmap.v2.Constant;
 import io.atlasmap.v2.Field;
+import io.atlasmap.v2.FieldGroup;
+import io.atlasmap.v2.FieldType;
 import io.atlasmap.v2.PropertyField;
 
 /**
- * A part of custom mapping builder API to implement custom mapping logic in Java code.
- * This class wraps raw {@link Field} and provide some utility methods to introspect
- * underlying field tree. {@link DefaultAtlasMappingBuilder#read(String, String)}
+ * A part of custom mapping builder API to implement custom mapping logic in
+ * Java code.
+ * This class wraps raw {@link Field} and provide some utility methods to
+ * introspect
+ * underlying field tree.
+ * {@link DefaultAtlasMappingBuilder#read(String, String)}
  * reads from source document and creates AtlasField.
+ * 
  * @see DefaultAtlasMappingBuilder
  */
 public class AtlasField {
@@ -50,6 +58,11 @@ public class AtlasField {
         this.fieldActionService = session.getAtlasContext().getContextFactory().getFieldActionService();
     }
 
+    public AtlasField copy() {
+        AtlasField atlasField = new AtlasField(session);
+        return atlasField;
+    }
+
     public AtlasField read(String docId, String path) throws AtlasException {
         AtlasModule module = session.resolveModule(docId);
         if (module == null) {
@@ -59,12 +72,26 @@ public class AtlasField {
             throw new AtlasException(String.format(
                     "Unable to read from %s Document '%s'", module.getMode(), docId));
         }
-        Field sourceField = module.createField();
-        sourceField.setDocId(docId);
-        sourceField.setPath(path);
-        session.head().setSourceField(sourceField);
-        module.readSourceValue(session);
-        setRawField(sourceField);
+        AtlasPath targetPath = new AtlasPath(path);
+        if (targetPath.hasCollection()) {
+
+            FieldGroup sourceFieldGroup = new FieldGroup();
+            sourceFieldGroup.setPath(path);
+            sourceFieldGroup.setDocId(docId);
+            sourceFieldGroup.setFieldType(FieldType.COMPLEX);
+            session.head().setSourceField(sourceFieldGroup);
+            module.readSourceValue(session);
+
+            setRawField(session.head().getSourceField());
+
+        } else {
+            Field sourceField = module.createField();
+            sourceField.setDocId(docId);
+            sourceField.setPath(path);
+            session.head().setSourceField(sourceField);
+            module.readSourceValue(session);
+            setRawField(sourceField);
+        }
         return this;
     }
 
@@ -127,9 +154,9 @@ public class AtlasField {
     }
 
     public AtlasField action(String actionName, List<Object> parameters) {
-        Object value = parameters != null && parameters.size() > 1 ? parameters.get(parameters.size()-1) : null;
+        Object value = parameters != null && parameters.size() > 1 ? parameters.get(parameters.size() - 1) : null;
         ActionProcessor ap = this.fieldActionService.findActionProcessor(actionName, value);
-        
+
         return this;
     }
 
@@ -140,5 +167,23 @@ public class AtlasField {
     public AtlasField setRawField(Field f) {
         this.rawField = f;
         return this;
+    }
+
+    public AtlasCollectionField collection() {
+        AtlasCollectionField collectionField = (AtlasCollectionField) this;
+
+        return null;
+    }
+
+    public Object unwrap(String docId, Class clazz, String contextPath) {
+        AtlasModule module = session.resolveModule(docId);
+        List objList = new ArrayList<>();
+        for (Field field : ((FieldGroup) session.head().getSourceField()).getField()) {
+            // Class myclass=com.ibsplc.iRes.shoppingrs.ObjectFactory.class;
+            objList.add(module.unwrap(field.getValue(), clazz, contextPath));
+        }
+        System.out.println(objList);
+        return objList;
+
     }
 }

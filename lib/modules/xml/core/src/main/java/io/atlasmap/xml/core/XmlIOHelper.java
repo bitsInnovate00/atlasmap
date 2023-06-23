@@ -15,12 +15,19 @@
  */
 package io.atlasmap.xml.core;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.StringWriter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.stream.FactoryConfigurationError;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -60,7 +67,8 @@ public final class XmlIOHelper {
         return children;
     }
 
-    public static List<Element> getChildrenWithNameStripAlias(String name, Optional<String> namespace, Element parentNode) {
+    public static List<Element> getChildrenWithNameStripAlias(String name, Optional<String> namespace,
+            Element parentNode) {
         List<Element> children = new LinkedList<>();
         if (parentNode == null) {
             return children;
@@ -98,6 +106,23 @@ public final class XmlIOHelper {
         } catch (Exception e) {
             throw new AtlasException(e);
         }
+    }
+
+    public XMLStreamReader writeDocumentToStreamReader(Node node) {
+        XMLStreamReader xmlStreamReader = null;
+        try {
+            Transformer transformer = transformerFactory.newTransformer();
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            StreamResult out = new StreamResult(outputStream);
+            transformer.transform(new DOMSource(node), out);
+            xmlStreamReader = XMLInputFactory.newInstance()
+                    .createXMLStreamReader(new ByteArrayInputStream(outputStream.toByteArray()));
+        } catch (XMLStreamException | FactoryConfigurationError | TransformerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return xmlStreamReader;
     }
 
     public static String getNodeNameWithoutNamespaceAlias(Node child) {
