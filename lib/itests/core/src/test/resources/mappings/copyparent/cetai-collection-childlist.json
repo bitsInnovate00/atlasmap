@@ -1,0 +1,65 @@
+{
+    "AtlasMapping" : {
+      "jsonType" : "io.atlasmap.v2.AtlasMapping",
+      "dataSource" : [ {
+        "jsonType" : "io.atlasmap.xml.v2.XmlDataSource",
+        "id" : "source-063520f5-7425-4a8d-abed-d08a0bcdbce6",
+        "name" : "source",
+        "description" : "Source document source type: XSD",
+        "uri" : "atlas:xml:source-063520f5-7425-4a8d-abed-d08a0bcdbce6",
+        "dataSourceType" : "SOURCE",
+        "xmlNamespaces" : {
+          "xmlNamespace" : [ ]
+        }
+      }, {
+        "jsonType" : "io.atlasmap.xml.v2.XmlDataSource",
+        "id" : "target-b806f5a9-e3c6-47a0-83c9-ce41e742f300",
+        "name" : "target",
+        "description" : "Target document target type: XSD",
+        "uri" : "atlas:xml:target-b806f5a9-e3c6-47a0-83c9-ce41e742f300",
+        "dataSourceType" : "TARGET",
+        "xmlNamespaces" : {
+          "xmlNamespace" : [ ]
+        }
+      } ],
+      "mappings" : {
+        "mapping" : [ {
+          "jsonType" : "io.atlasmap.v2.Collection",
+          "mappingType" : "COLLECTION",
+          "mappings" : {
+            "mapping" : [ {
+              "jsonType" : "io.atlasmap.v2.Mapping",
+              "mappingType" : "MAP",
+              "inputField" : [ {
+                "jsonType" : "io.atlasmap.xml.v2.XmlField",
+                "docId" : "source-063520f5-7425-4a8d-abed-d08a0bcdbce6",
+                "path" : "/root/firstArray<>/secondArray<>/secondvalue",
+                "fieldType" : "STRING",
+                "name" : "firstName"
+              } ],
+              "outputField" : [ {
+                "jsonType" : "io.atlasmap.xml.v2.XmlField",
+                "docId" : "target-b806f5a9-e3c6-47a0-83c9-ce41e742f300",
+                "path" : "/root/target<>/targetValue<>",
+                "fieldType" : "STRING",
+                "name" : "targetValue"
+              } ]
+            }
+           ]
+          }
+        } ]
+      },
+      
+      
+      "lookupTables" : {
+        "lookupTable" : [ ]
+      },
+      "constants" : {
+        "constant" : [ ]
+      },
+      "properties" : {
+        "property" : [ ]
+      },
+      "name" : "UI.0"
+    }
+  }
