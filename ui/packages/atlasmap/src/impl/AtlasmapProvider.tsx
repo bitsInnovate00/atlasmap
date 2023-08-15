@@ -13,6 +13,7 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
+import * as constants from '../atlasmap.json';
 import {
   DataActionPayload,
   IDataState,
@@ -27,7 +28,6 @@ import {
   DocumentType,
   InspectionType,
   MappingSerializer,
-  TransitionMode,
 } from '@atlasmap/core';
 import { IAtlasmapDocument, IAtlasmapField } from '../Views';
 import React, {
@@ -188,6 +188,7 @@ export const AtlasmapProvider: FunctionComponent<IAtlasmapProviderProps> = ({
       initializationService.resetConfig();
       const cfg = initializationService.cfg;
       cfg.logger?.setLevel(logLevel as LogLevelDesc);
+      cfg.initCfg.dataMapperVersion = constants.version;
 
       cfg.initCfg.baseMappingServiceUrl = baseMappingServiceUrl;
       cfg.initCfg.baseJavaInspectionServiceUrl = baseJavaInspectionServiceUrl;
@@ -532,36 +533,9 @@ export function useAtlasmap() {
    */
   const canAddToSelectedMapping = useCallback(
     (isSource: boolean): boolean => {
-      const { selectedMapping } = context;
-      if (
-        !selectedMapping ||
-        (selectedMapping.mapping.transition.mode === TransitionMode.ENUM &&
-          selectedMapping.sourceFields.length > 0 &&
-          selectedMapping.targetFields.length > 0)
-      ) {
-        return false;
-      }
-      if (
-        selectedMapping.sourceFields.length <= 1 &&
-        selectedMapping.targetFields.length <= 1
-      ) {
-        return true;
-      } else if (
-        isSource &&
-        (selectedMapping.targetFields.length <= 1 ||
-          selectedMapping.sourceFields.length === 0)
-      ) {
-        return true;
-      } else if (
-        !isSource &&
-        (selectedMapping.sourceFields.length <= 1 ||
-          selectedMapping.targetFields.length === 0)
-      ) {
-        return true;
-      }
-      return false;
+      return configModel.mappingService.canAddToActiveMapping(isSource);
     },
-    [context],
+    [configModel],
   );
 
   /**
@@ -569,65 +543,22 @@ export function useAtlasmap() {
    * from the specified panel, false otherwise.
    */
   const isFieldAddableToSelection = useCallback(
-    (
-      documentType: 'source' | 'target',
-      field: IAtlasmapField,
-      dropTarget?: IAtlasmapField,
-    ): boolean => {
-      const { selectedMapping } = context;
-      const isSource = documentType === 'source';
-      if (
-        !field ||
-        !field.amField.isTerminal() ||
-        dropTarget?.type === 'UNSUPPORTED' ||
-        (selectedMapping &&
-          selectedMapping.mapping.transition.mode === TransitionMode.ENUM &&
-          selectedMapping.sourceFields.length > 0 &&
-          selectedMapping.targetFields.length > 0)
-      ) {
-        return false;
-      }
-      if (!selectedMapping || (dropTarget && !dropTarget.isConnected)) {
-        return true;
-      }
-      if (
-        selectedMapping.sourceFields.length <= 1 &&
-        selectedMapping.targetFields.length <= 1
-      ) {
-        if (
-          isSource &&
-          !selectedMapping.sourceFields.find((f) => f.id === field.id)
-        ) {
-          return true;
-        } else if (
-          field.isCollection ||
-          field.isInCollection ||
-          (!field.isConnected &&
-            !selectedMapping.targetFields.find((f) => f.id === field.id))
-        ) {
-          return true;
-        }
-      } else if (
-        isSource &&
-        (selectedMapping.targetFields.length <= 1 ||
-          selectedMapping.sourceFields.length === 0) &&
-        !selectedMapping.sourceFields.find((f) => f.id === field.id)
-      ) {
-        return true;
-      } else if (
-        !isSource &&
-        (field.isCollection ||
-          field.isInCollection ||
-          (!field.isConnected &&
-            (selectedMapping.sourceFields.length <= 1 ||
-              selectedMapping.targetFields.length === 0) &&
-            !selectedMapping.targetFields.find((f) => f.id === field.id)))
-      ) {
-        return true;
-      }
-      return false;
+    (_documentType: 'source' | 'target', field: IAtlasmapField): boolean => {
+      return configModel.mappingService.isFieldAddableToActiveMapping(
+        field.amField,
+      );
     },
-    [context],
+    [configModel],
+  );
+
+  const isFieldDragAndDropAllowed = useCallback(
+    (field: IAtlasmapField, dropTarget: IAtlasmapField): boolean => {
+      return configModel.mappingService.isFieldDragAndDropAllowed(
+        field.amField,
+        dropTarget.amField,
+      );
+    },
+    [configModel],
   );
 
   const isFieldRemovableFromSelection = useCallback(
@@ -702,6 +633,7 @@ export function useAtlasmap() {
     trailerId,
     canAddToSelectedMapping,
     isFieldAddableToSelection,
+    isFieldDragAndDropAllowed,
     isFieldRemovableFromSelection,
     searchSources,
     searchTargets,

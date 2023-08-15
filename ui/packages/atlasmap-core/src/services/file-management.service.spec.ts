@@ -13,24 +13,20 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-import {
-  ConfigModel,
-  DocumentInitializationModel,
-} from '../models/config.model';
 import { DocumentDefinition, MappingDefinition } from '../models';
 import { DocumentType, InspectionType } from '../contracts/common';
 import { TextDecoder, TextEncoder } from 'text-encoding';
 
 import { ADMDigest } from '../contracts/adm-digest';
 import { CommonUtil } from '../utils/common-util';
-import { ErrorHandlerService } from './error-handler.service';
+import { DocumentInitializationModel } from '../models/config.model';
 import { ErrorLevel } from '../models/error.model';
 import { FileManagementService } from './file-management.service';
 import FileSaver from 'file-saver';
 import { InitializationService } from './initialization.service';
 import { MAPPING_JSON_TYPE } from '../contracts/mapping';
 import fs from 'fs';
-import ky from 'ky/umd';
+import ky from 'ky';
 import log from 'loglevel';
 import { mocked } from 'ts-jest/utils';
 import pako from 'pako';
@@ -42,15 +38,15 @@ describe('FileManagementService', () => {
   const mockedKy = mocked(ky, true);
   const service = new FileManagementService(ky);
   jest.mock('file-saver');
-  const mockedFileSaver = mocked(FileSaver);
   jest.mock('../utils/common-util');
   const mockedCommonUtil = mocked(CommonUtil, true);
   jest.mock('pako');
   const mockedPako = mocked(pako);
+  const mockedFileSaver = mocked(FileSaver);
 
   beforeEach(() => {
-    service.cfg = new ConfigModel();
-    service.cfg.errorService = new ErrorHandlerService();
+    const initService = new InitializationService(ky);
+    service.cfg = initService.cfg;
     service.cfg.logger = log.getLogger('config');
     service.cfg.fileService = service;
   });
@@ -400,7 +396,7 @@ describe('FileManagementService', () => {
         }
       })()
     );
-    mockedFileSaver.saveAs = jest.fn().mockImplementation((_data) => {});
+    jest.spyOn(FileSaver, 'saveAs').mockImplementation((_data) => {});
     service.cfg.mappings = new MappingDefinition();
     const srcDoc = new DocumentDefinition();
     srcDoc.name = 'dummy source document';

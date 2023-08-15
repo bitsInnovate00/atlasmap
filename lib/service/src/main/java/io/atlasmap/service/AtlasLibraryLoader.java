@@ -21,8 +21,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Modifier;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -84,13 +86,26 @@ public class AtlasLibraryLoader extends CompoundClassLoader {
         reload();
     }
 
-    public void clearLibaries() {
+    public void clearLibraries() {
+        if (this.urlClassLoader != null) {
+            try {
+                this.urlClassLoader.close();
+            } catch (Exception e) {
+                LOG.warn("Ignoring an error while closing an old URLClassLoader: {}", e.getMessage());
+            }
+            this.urlClassLoader = null;
+        }
+
         File[] files = saveDir.listFiles();
         if (!saveDir.exists() || !saveDir.isDirectory() || files == null) {
             return;
         }
         for (File f : saveDir.listFiles()) {
-            f.delete();
+            try {
+                Files.delete(f.toPath());
+             } catch (Exception e) {
+                LOG.warn("Failed to remove jar file: '{}'", e.getMessage());
+            };
         }
         reload();
     }
@@ -105,18 +120,14 @@ public class AtlasLibraryLoader extends CompoundClassLoader {
         URL candidateURLs[] = this.urlClassLoader.getURLs();
 
         for (int i=0; i < candidateURLs.length; i++) {
-            ZipInputStream zip;
-            try {
-                zip = new ZipInputStream(new FileInputStream(candidateURLs[i].getPath()));
-
+            try (ZipInputStream zip = new ZipInputStream(new FileInputStream(candidateURLs[i].toURI().getPath()))) {
                 for (ZipEntry entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
                     if (!entry.isDirectory() && entry.getName().endsWith(classSuffix)) {
                         String className = entry.getName().replace('/', '.');
                         classNames.add(className.substring(0, className.length() - classSuffix.length()));
                     }
                 }
-                zip.close();
-            } catch (IOException e) {
+            } catch (IOException | URISyntaxException e) {
                 throw new AtlasException(String.format("URL library '%s' access error: %s",
                     candidateURLs[i].getPath(), e.getMessage()));
             }

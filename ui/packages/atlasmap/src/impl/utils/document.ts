@@ -18,6 +18,10 @@ import {
   CommonUtil,
   ConfigModel,
   DocumentDefinition,
+  ErrorInfo,
+  ErrorLevel,
+  ErrorScope,
+  ErrorType,
   NamespaceModel,
 } from '@atlasmap/core';
 
@@ -213,6 +217,14 @@ export async function importInstanceSchema(
       .then(() => {
         cfg.fileService.updateDigestFile().finally(() => {
           cfg.initializationService.updateStatus();
+          cfg.errorService.addError(
+            new ErrorInfo({
+              message: `${selectedFile.name} import complete.`,
+              level: ErrorLevel.INFO,
+              scope: ErrorScope.APPLICATION,
+              type: ErrorType.USER,
+            }),
+          );
           resolve(true);
         });
       });

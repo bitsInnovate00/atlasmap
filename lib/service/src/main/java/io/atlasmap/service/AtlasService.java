@@ -94,6 +94,7 @@ public class AtlasService {
 
     public AtlasService() throws AtlasException {
         String atlasmapWorkspace = System.getProperty(ATLASMAP_WORKSPACE);
+        LOG.debug("AtlasMap backend Working directory: {}", atlasmapWorkspace);
         if (atlasmapWorkspace != null && atlasmapWorkspace.length() > 0) {
             baseFolder = atlasmapWorkspace;
         }
@@ -120,15 +121,16 @@ public class AtlasService {
 
         String atlasmapAdmPath = System.getProperty(ATLASMAP_ADM_PATH);
         if (atlasmapAdmPath != null && atlasmapAdmPath.length() > 0) {
-            this.libraryLoader.clearLibaries();
+            LOG.debug("Loading initial ADM file: {}", atlasmapAdmPath);
+            this.libraryLoader.clearLibraries();
             ADMArchiveHandler admHandler = new ADMArchiveHandler(this.libraryLoader);
             java.nio.file.Path mappingDirPath = Paths.get(getMappingSubDirectory(0));
             admHandler.setPersistDirectory(mappingDirPath);
             admHandler.setIgnoreLibrary(false);
             admHandler.setLibraryDirectory(Paths.get(libFolder));
             admHandler.load(Paths.get(atlasmapAdmPath));
-            admHandler.persist();
             this.libraryLoader.reload();
+            admHandler.persist();
         }
 
         synchronized (atlasContextFactory) {
@@ -302,7 +304,7 @@ public class AtlasService {
         @ApiResponse(responseCode = "204", description = "Unable to remove all user-defined JAR files")})
     public Response resetUserLibs() {
         LOG.debug("resetUserLibs");
-        this.libraryLoader.clearLibaries();
+        this.libraryLoader.clearLibraries();
         return Response.ok().build();
     }
 
@@ -441,8 +443,8 @@ public class AtlasService {
                 admHandler.setIgnoreLibrary(false);
                 admHandler.setLibraryDirectory(Paths.get(libFolder));
                 admHandler.load(mapping);
-                admHandler.persist();
                 this.libraryLoader.reload();
+                admHandler.persist();
                 LOG.debug("  importADMArchiveRequest complete - ID:'{}'", mappingDefinitionId);
             } catch (Exception e) {
                 LOG.error("Error importing ADM archive.\n" + e.getMessage(), e);
@@ -630,7 +632,12 @@ public class AtlasService {
             if (LOG.isDebugEnabled()) {
                 LOG.error("", e);
             }
-            throw new WebApplicationException("Could not read file part: " + e.getMessage());
+            StringBuilder buf = new StringBuilder();
+            buf.append("Failed to import a jar file. This error occurs when:\n")
+                .append(("\t1. The jar file is not compatible with the JVM AtlasMap backend server is running on\n"))
+                .append("\t2. The jar file is broken\n")
+                .append("\t3. There is a missing file under META-INF/services, i.e. Java service declaration for custom transformation, custom transformation model, custom mapping builder, etc\n");
+            throw new WebApplicationException(buf.toString(), e);
         }
         return Response.ok().build();
     }

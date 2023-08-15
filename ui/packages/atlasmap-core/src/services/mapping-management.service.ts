@@ -32,6 +32,7 @@ import { CommonUtil } from '../utils/common-util';
 import { ConfigModel } from '../models/config.model';
 import { Field } from '../models/field.model';
 import { FieldAction } from '../models/field-action.model';
+import { FieldType } from '../contracts/common';
 import { MappingDefinition } from '../models/mapping-definition.model';
 import { MappingSerializer } from '../utils/mapping-serializer';
 import { MappingUtil } from '../utils/mapping-util';
@@ -273,6 +274,9 @@ export class MappingManagementService {
     return;
   }
 
+  /**
+   * @FIXME Migrate with isFieldAddableToActiveMapping() - https://github.com/atlasmap/atlasmap/issues/3442
+   */
   getFieldSelectionExclusionReason(
     mapping: MappingModel,
     field: Field
@@ -320,8 +324,178 @@ export class MappingManagementService {
     return null;
   }
 
+  /**
+   * @FIXME Migrate with isFieldAddableToActiveMapping() - https://github.com/atlasmap/atlasmap/issues/3442
+   */
   isFieldSelectable(mapping: MappingModel, field: Field): boolean {
     return this.getFieldSelectionExclusionReason(mapping, field) == null;
+  }
+
+  /**
+   * Return true if it's possible to add a source or target field to the active
+   * mapping, false otherwise.
+   * @param isSource true if it's source field, or false
+   * @returns
+   */
+  canAddToActiveMapping(isSource: boolean): boolean {
+    const selectedMapping = this.cfg.mappings?.activeMapping;
+    if (
+      !selectedMapping ||
+      (selectedMapping.transition.mode === TransitionMode.ENUM &&
+        selectedMapping.sourceFields.length > 0 &&
+        selectedMapping.targetFields.length > 0)
+    ) {
+      return false;
+    }
+    if (
+      selectedMapping.sourceFields.length <= 1 &&
+      selectedMapping.targetFields.length <= 1
+    ) {
+      return true;
+    } else if (
+      isSource &&
+      (selectedMapping.targetFields.length <= 1 ||
+        selectedMapping.sourceFields.length === 0)
+    ) {
+      return true;
+    } else if (
+      !isSource &&
+      (selectedMapping.sourceFields.length <= 1 ||
+        selectedMapping.targetFields.length === 0)
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Return true if it's possible to add the specified field to the
+   * specified mapping, or if it's possible to create a new mapping
+   * with the specified field when the specified mapping is null or undefined,
+   * false otherwise.
+   * @param field field
+   * @param mapping a mapping to add the field
+   */
+  isFieldAddableToMapping(
+    field: Field,
+    mapping?: MappingModel | null
+  ): boolean {
+    if (
+      !field ||
+      !field.isTerminal() ||
+      field.type === FieldType.UNSUPPORTED ||
+      (mapping &&
+        mapping.transition.mode === TransitionMode.ENUM &&
+        mapping.sourceFields.length > 0 &&
+        mapping.targetFields.length > 0)
+    ) {
+      return false;
+    }
+
+    // non-collection target field can't participate to more than one mapping
+    if (
+      !field.isSource() &&
+      !field.isCollection &&
+      !field.isInCollection() &&
+      this.cfg.mappings?.findMappingsForField(field).length !== 0
+    ) {
+      return false;
+    }
+
+    if (!mapping) {
+      return true;
+    }
+    if (mapping.transition.mode === TransitionMode.EXPRESSION) {
+      return field.isSource() || mapping.targetFields.length === 0;
+    }
+    // skip if already in the mapping
+    if (
+      (field.isSource() &&
+        mapping.sourceFields.find((f) => f.field === field)) ||
+      (!field.isSource() && mapping.targetFields.find((f) => f.field === field))
+    ) {
+      return false;
+    }
+    // adding a collection field
+    if (field.isCollection || field.isInCollection()) {
+      return field.isSource()
+        ? mapping.sourceFields.length === 0
+        : mapping.targetFields.length === 0;
+    }
+
+    if (field.isSource()) {
+      // adding a source non-collection field
+      if (mapping.sourceFields.length === 0) {
+        return true;
+      }
+      return (
+        !mapping.sourceFields.find(
+          (f) => f.field?.isCollection || f.field?.isInCollection()
+        ) && mapping.targetFields.length <= 1
+      );
+    } else {
+      // adding a target non-collection field
+      if (mapping.targetFields.length === 0) {
+        return true;
+      }
+      return (
+        !mapping.targetFields.find(
+          (f) => f.field?.isCollection || f.field?.isInCollection()
+        ) && mapping.sourceFields.length <= 1
+      );
+    }
+  }
+
+  /**
+   * Return true if it's possible to add the specified source field to the
+   * active mapping, false otherwise.
+   * @param field field
+   * @param dropTarget a destination field to drop if it's drag & drop
+   */
+  isFieldAddableToActiveMapping(field: Field): boolean {
+    return this.isFieldAddableToMapping(
+      field,
+      this.cfg.mappings?.activeMapping
+    );
+  }
+
+  /**
+   * Return true if it's possible to drag a field to the destination field, false otherwise.
+   * @param src dragging field
+   * @param dest a destination field to drop
+   */
+  isFieldDragAndDropAllowed(src?: Field, dest?: Field): boolean {
+    if (
+      !src ||
+      !dest ||
+      (src.isSource() && dest.isSource()) ||
+      (!src.isSource() && !dest.isSource())
+    ) {
+      return false;
+    }
+    const source = src.isSource() ? src : dest;
+    const target = src.isSource() ? dest : src;
+
+    const activeMapping = this.cfg.mappings?.activeMapping;
+    if (activeMapping) {
+      if (
+        activeMapping.isFieldMapped(source) &&
+        activeMapping.isFieldMapped(target)
+      ) {
+        return false;
+      }
+      if (activeMapping.isFieldMapped(source)) {
+        return this.isFieldAddableToMapping(target, activeMapping);
+      }
+      if (activeMapping.isFieldMapped(target)) {
+        return this.isFieldAddableToMapping(source, activeMapping);
+      }
+    }
+    // It'll create a new mapping
+    return (
+      this.isFieldAddableToMapping(source, null) &&
+      this.isFieldAddableToMapping(target, null)
+    );
   }
 
   /**
@@ -614,6 +788,10 @@ export class MappingManagementService {
         mapping.transition.transitionFieldAction.setArgumentValue(
           'delimiter',
           ' '
+        );
+        mapping.transition.transitionFieldAction.setArgumentValue(
+          'collapseRepeatingDelimiters',
+          'false'
         );
       }
       return;

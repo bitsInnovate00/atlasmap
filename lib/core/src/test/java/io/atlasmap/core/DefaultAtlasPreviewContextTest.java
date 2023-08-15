@@ -25,6 +25,7 @@ import io.atlasmap.api.AtlasConstants;
 import io.atlasmap.api.AtlasException;
 import io.atlasmap.v2.Action;
 import io.atlasmap.v2.Audits;
+import io.atlasmap.v2.Capitalize;
 import io.atlasmap.v2.CollectionType;
 import io.atlasmap.v2.Concatenate;
 import io.atlasmap.v2.ConstantField;
@@ -179,14 +180,14 @@ public class DefaultAtlasPreviewContextTest extends BaseDefaultAtlasContextTest 
         source1.setValue("one");
         Field source2 = new SimpleField();
         source2.setFieldType(FieldType.STRING);
-        source2.setPath("/two");
+        source2.setPath("/three");
         source2.setIndex(3);
-        source2.setValue("two");
+        source2.setValue("three");
         Field source3 = new SimpleField();
         source3.setFieldType(FieldType.STRING);
-        source3.setPath("/six");
+        source3.setPath("/five");
         source3.setIndex(5);
-        source3.setValue("six");
+        source3.setValue("five");
         FieldGroup group = new FieldGroup();
         group.getField().add(source1);
         group.getField().add(source2);
@@ -202,7 +203,58 @@ public class DefaultAtlasPreviewContextTest extends BaseDefaultAtlasContextTest 
         m.getOutputField().add(target);
         previewContext.processPreview(m);
         target = m.getOutputField().get(0);
-        assertEquals("-one--two--six", target.getValue());
+        assertEquals("-one--three--five", target.getValue());
+    }
+
+    @Test
+    public void testProcessActionConcatenateCollectionAndNonCollection() throws Exception {
+        Mapping m = new Mapping();
+        Field source1 = new SimpleField();
+        source1.setFieldType(FieldType.STRING);
+        source1.setPath("/list<1>");
+        source1.setIndex(1);
+        source1.setValue("one");
+        Field source2 = new SimpleField();
+        source2.setFieldType(FieldType.STRING);
+        source2.setPath("/list<3>");
+        source2.setIndex(3);
+        source2.setValue("three");
+        Field source3 = new SimpleField();
+        source3.setFieldType(FieldType.STRING);
+        source3.setPath("/list<5>");
+        source3.setIndex(5);
+        source3.setValue("five");
+        FieldGroup list = new FieldGroup();
+        list.setCollectionType(CollectionType.LIST);
+        list.setIndex(0);
+        list.setPath("/list<>");
+        list.getField().add(source1);
+        list.getField().add(source2);
+        list.getField().add(source3);
+        Capitalize capitalize = new Capitalize();
+        list.setActions(new ArrayList<>());
+        list.getActions().add(capitalize);
+        Field f = new SimpleField();
+        f.setFieldType(FieldType.STRING);
+        f.setIndex(1);
+        f.setPath("/nc");
+        f.setValue("nc");
+        FieldGroup group = new FieldGroup();
+        group.getField().add(list);
+        group.getField().add(f);
+        Concatenate action = new Concatenate();
+        action.setDelimiter("-");
+        action.setDelimitingEmptyValues(true);
+        group.setActions(new ArrayList<>());
+        group.getActions().add(action);
+        m.setInputFieldGroup(group);
+        Field target = new SimpleField();
+        target.setFieldType(FieldType.STRING);
+        m.getOutputField().add(target);
+        previewContext.processPreview(m);
+        target = m.getOutputField().get(0);
+        assertEquals("-One--Three--Five-nc", target.getValue());
+
     }
 
     @Test
@@ -210,6 +262,7 @@ public class DefaultAtlasPreviewContextTest extends BaseDefaultAtlasContextTest 
         Mapping m = new Mapping();
         Field source = new SimpleField();
         source.setFieldType(FieldType.STRING);
+        source.setPath("/source");
         source.setValue("one two three four");
         source.setActions(new ArrayList<>());
         Split action = new Split();
@@ -217,14 +270,17 @@ public class DefaultAtlasPreviewContextTest extends BaseDefaultAtlasContextTest 
         source.getActions().add(action);
         m.getInputField().add(source);
         Field target1 = new SimpleField();
+        target1.setPath("/target1");
         target1.setIndex(0);
         target1.setFieldType(FieldType.STRING);
         m.getOutputField().add(target1);
         Field target2 = new SimpleField();
+        target2.setPath("/target2");
         target2.setIndex(1);
         target2.setFieldType(FieldType.STRING);
         m.getOutputField().add(target2);
         Field target3 = new SimpleField();
+        target3.setPath("/target3");
         target3.setIndex(3);
         target3.setFieldType(FieldType.STRING);
         m.getOutputField().add(target3);

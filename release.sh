@@ -106,20 +106,17 @@ pushd docs
 popd
 
 echo "=========================================================="
-echo "Performing Maven Release ...."
+echo "Performing Maven Release & Docker push...."
 echo "=========================================================="
 "${MAVEN_CMD}" $MAVEN_PARAMETERS -Dtag=atlasmap-${RELEASE_VERSION} \
                -DreleaseVersion=${RELEASE_VERSION} \
                -DdevelopmentVersion=${DEVELOPMENT_VERSION} \
                release:prepare
+
 "${MAVEN_CMD}" $MAVEN_PARAMETERS -Dtag=atlasmap-${RELEASE_VERSION} \
                -DreleaseVersion=${RELEASE_VERSION} \
                -DdevelopmentVersion=${DEVELOPMENT_VERSION} \
                release:perform
-# above fails to close staging repo, thus skip the release as well
-# pushd target/checkout
-# "${MAVEN_CMD}" $MAVEN_PARAMETERS nexus-staging:release
-# popd
 
 xmllint --shell atlasmap-maven-plugin/atlasmap-maven-plugin-example.pom << EOF
 cd /*[local-name() = 'project']/*[local-name() = 'version']
@@ -135,24 +132,7 @@ EOF
 
 "${MAVEN_CMD}" $MAVEN_PARAMETERS -DskipTests install
 git add atlasmap-maven-plugin docs
-git diff-index --quiet HEAD || git commit -m "chore: cleanup after release ${RELEASE_VERSION}"
-
-# tag the major/minor version and docker push it
-echo "=========================================================="
-echo "Pushing docker images to Docker Hub...."
-echo "=========================================================="
-pushd standalone
-ATLASMAP_IMAGE="atlasmap/atlasmap"
-JKUBE_OPTION="-Pdocker -Djkube.docker.username=${DOCKER_USER}"
-JKUBE_OPTION="${JKUBE_OPTION} -Djkube.docker.password=${DOCKER_PASSWORD}"
-JKUBE_OPTION="${JKUBE_OPTION} -Dimage.tag.primary=${RELEASE_VERSION}"
-if [ $RELEASE_VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]; then
-  MAJOR_MINOR_VERSION=$(echo $RELEASE_VERSION | cut -f1,2 -d'.')
-  JKUBE_OPTION="${JKUBE_OPTION} -Dimage.tag.secondary=${MAJOR_MINOR_VERSION}"
-fi
-JKUBE_OPTION="${JKUBE_OPTION} k8s:build k8s:push"
-"${MAVEN_CMD}" $MAVEN_PARAMETERS $JKUBE_OPTION
-popd
+git diff --quiet HEAD || git commit -m "chore: cleanup after release ${RELEASE_VERSION}"
 
 echo "=========================================================="
 echo "Publishing NPM package of AtlasMap UI...."

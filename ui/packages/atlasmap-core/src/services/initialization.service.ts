@@ -36,7 +36,8 @@ import { MappingManagementService } from './mapping-management.service';
 import { MappingPreviewService } from './mapping-preview.service';
 import { MappingSerializer } from '../utils/mapping-serializer';
 import { MappingUtil } from '../utils/mapping-util';
-import ky from 'ky/umd';
+import { first } from 'rxjs/operators';
+import ky from 'ky';
 import log from 'loglevel';
 
 log.setDefaultLevel(log.levels.WARN);
@@ -146,11 +147,37 @@ export class InitializationService {
 
       // load documents from initialization parameters in embedded mode
       this.updateLoadingStatus('Loading source/target documents.');
-      this.cfg.documentService.inspectDocuments().subscribe({
-        next: () => {
-          this.updateStatus();
-        },
-      });
+      const allDocs = this.cfg.getAllDocs();
+      // assumption is that there will be at least one document present
+      const lastDoc = allDocs[allDocs.length - 1];
+      this.cfg.documentService
+        .inspectDocuments()
+        // inspectedDocuments notifies for all documents, wait till the last document
+        .pipe(first((d) => d === lastDoc))
+        .subscribe({
+          next: () => {
+            // updateStatus() will nullify this.cfg.preloadedMappingJson
+            // let's store it for comparisson below
+            const preloadedMappingJson = this.cfg.preloadedMappingJson;
+            this.updateStatus();
+            this.systemInitializedSource.pipe(first()).subscribe(() => {
+              if (preloadedMappingJson) {
+                const maybeUpdatedMappingJson = JSON.stringify(
+                  MappingSerializer.serializeMappings(this.cfg)
+                );
+                // inspection might change the mapping, for example the preloaded
+                // mapping could have a document URI that is no longer the same
+                // after inspection, e.g. when parameters change on the provided
+                // documents and differ from the parameters embedded in the
+                // provided mapping; in that case we need to notify that mapping
+                // has been changed
+                if (preloadedMappingJson !== maybeUpdatedMappingJson) {
+                  this.cfg.mappingService.notifyMappingUpdated();
+                }
+              }
+            });
+          },
+        });
 
       this.initializeWithMappingDigest().finally(() => {
         this.updateStatus();
@@ -201,6 +228,24 @@ export class InitializationService {
           reject(error);
         });
     });
+  }
+
+  /**
+   * Return the UI version as a string.
+   *
+   * @returns UI version
+   */
+  getUIVersion(): string {
+    return this.cfg.initCfg.dataMapperVersion;
+  }
+
+  /**
+   * Set the UI version.
+   *
+   * @param uiVersion - version to set
+   */
+  setUIVersion(uiVersion: string) {
+    this.cfg.initCfg.dataMapperVersion = uiVersion;
   }
 
   /**
@@ -285,8 +330,8 @@ export class InitializationService {
         const fragData = mappingDigest.exportBlockData[fragIndex].value;
         const docID = metaFragment.id ? metaFragment.id : metaFragment.name;
         const docType = metaFragment.dataSourceType
-          ? (metaFragment.dataSourceType as DocumentType)
-          : (metaFragment.documentType as DocumentType);
+          ? (metaFragment.dataSourceType.toUpperCase() as DocumentType)
+          : (metaFragment.documentType?.toUpperCase() as DocumentType);
         const isSource =
           typeof metaFragment.isSource === 'string'
             ? (metaFragment.isSource as string).toLowerCase() === 'true'

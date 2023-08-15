@@ -217,6 +217,11 @@ public class ADMArchiveHandler {
                 this.mappingDefinition = jsonMapper.readValue(getMappingDefinitionBytes(), AtlasMapping.class);
             } catch (Exception e) {
                 LOG.warn("Invalid serialized mapping definition content detected, discarding");
+                if (LOG.isDebugEnabled()) {
+                    String str = String.format("Mapping Definition: [%s]: ",
+                        getMappingDefinitionBytes() != null ? new String(getMappingDefinitionBytes()) : "");
+                    LOG.warn(str, e);
+                }
                 this.mappingDefinitionBytes = null;
                 this.mappingDefinition = null;
             }
@@ -474,12 +479,12 @@ public class ADMArchiveHandler {
             throw new AtlasException(String.format("Directory must not be Null"));
         }
         File dirf = dir.toFile();
-        if (!dirf.isDirectory()) {
+        if (dirf.exists() && !dirf.isDirectory()) {
             throw new AtlasException(String.format("File '%s' is not a directory", dirf.getAbsolutePath()));
-        }
-        if (!dirf.exists()) {
+        } else if (!dirf.exists()) {
             dirf.mkdirs();
         }
+
         return true;
     }
 

@@ -34,6 +34,7 @@ import io.atlasmap.spi.AtlasFieldWriter;
 import io.atlasmap.spi.AtlasInternalSession;
 import io.atlasmap.v2.CollectionType;
 import io.atlasmap.v2.Field;
+import io.atlasmap.v2.FieldStatus;
 import io.atlasmap.v2.FieldType;
 import io.atlasmap.xml.core.XmlPath.XmlSegmentContext;
 
@@ -114,7 +115,7 @@ public class XmlFieldWriter extends XmlFieldTransformer implements AtlasFieldWri
                     // if current segment of path isn't attribute, it refers to a child element,
                     // find it or create it..
                     Element childNode = getChildNode(parentNode, parentSegment, segment);
-                    if (childNode == null) {
+                    if (childNode == null && targetField.getStatus() != FieldStatus.NOT_FOUND) {
                         childNode = createParentNode(parentNode, parentSegment, segment);
                     }
                     if (childNode == null) {
@@ -203,7 +204,11 @@ public class XmlFieldWriter extends XmlFieldTransformer implements AtlasFieldWri
         }
         Element childNode = children.size() > 0 ? children.get(0) : null;
         if (children.size() > 0 && segment.getCollectionType() != CollectionType.NONE) {
-            int index = segment.getCollectionIndex();
+            Integer index = segment.getCollectionIndex();
+            if(index == null) {
+                // no collection entry - it will only create parent nodes of the collection
+                return null;
+            }
             childNode = null;
             if (children.size() > index) {
                 childNode = children.get(index);

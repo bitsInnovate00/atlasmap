@@ -44,6 +44,7 @@ import io.atlasmap.api.AtlasConversionException;
 import io.atlasmap.api.AtlasException;
 import io.atlasmap.api.AtlasSession;
 import io.atlasmap.mxbean.AtlasContextMXBean;
+import io.atlasmap.spi.AtlasInternalSession;
 import io.atlasmap.spi.AtlasModule;
 import io.atlasmap.spi.AtlasModuleInfo;
 import io.atlasmap.spi.AtlasModuleInfoRegistry;
@@ -118,6 +119,33 @@ public class DefaultAtlasContext implements AtlasContext, AtlasContextMXBean {
     }
 
     /**
+     * Compare the core version to the extract mapping version.  No mapping version
+     * we'll accept as ok, otherwise compare major.minor.
+     *
+     * @param coreVersion - this runtime version
+     * @param mappingVersion - the extracted mapping version
+     *
+     * @return true if valid, false otherwise
+     */
+    private boolean validateVersion(String coreVersion, String mappingVersion) {
+        if (mappingVersion != null && mappingVersion.length() > 0) {
+            String[] mappingVersionComps = mappingVersion.split("\\.");
+            String[] coreVersionComps = coreVersion.split("\\.");
+            if (coreVersionComps.length < 2 || mappingVersionComps.length < 2) {
+                return false;
+            }
+            if (Integer.parseInt(coreVersionComps[0]) < Integer.parseInt(mappingVersionComps[0])) {
+                return false;
+            }
+            if (Integer.parseInt(coreVersionComps[0]) == Integer.parseInt(mappingVersionComps[0]) &&
+                Integer.parseInt(coreVersionComps[1]) < Integer.parseInt(mappingVersionComps[1])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * TODO: For dynamic re-load. This needs lock()
      *
      * @throws AtlasException failed to initialize
@@ -142,7 +170,14 @@ public class DefaultAtlasContext implements AtlasContext, AtlasContextMXBean {
                     , this.atlasMappingUri);
             return;
         }
-
+        AtlasMapping atlasMapping = this.admHandler.getMappingDefinition();
+        String version = factory.getProperties().get(AtlasContextFactory.PROPERTY_ATLASMAP_CORE_VERSION);
+        String mappingVersion = atlasMapping.getVersion();
+        if (!validateVersion(version, mappingVersion)) {
+            LOG.error("Mapping definition version {} detected. It may not work as expected with runtime version {}.",
+                mappingVersion,
+                version);
+        }
         sourceModules.clear();
         ConstantModule constant = new ConstantModule();
         constant.setConversionService(factory.getConversionService());
@@ -196,7 +231,7 @@ public class DefaultAtlasContext implements AtlasContext, AtlasContextMXBean {
             }
 
             try {
-                AtlasModule module = moduleInfo.getModuleClass().newInstance();
+                AtlasModule module = moduleInfo.getModuleClass().getDeclaredConstructor().newInstance();
                 module.setClassLoader(factory.getClassLoader());
                 module.setConversionService(factory.getConversionService());
                 module.setFieldActionService(factory.getFieldActionService());
@@ -447,6 +482,8 @@ public class DefaultAtlasContext implements AtlasContext, AtlasContextMXBean {
             session.head().setSourceField(sourceField);
             if (sourceField instanceof FieldGroup) {
                 processSourceFields(session, ((FieldGroup)sourceField).getField());
+                Field processed = applyFieldActions(session, sourceField);
+                session.head().setSourceField(processed);
                 continue;
             }
 
@@ -611,7 +648,7 @@ public class DefaultAtlasContext implements AtlasContext, AtlasContextMXBean {
                             "Failed to write field value into target document: " + e.getMessage(),
                             AuditStatus.ERROR, null);
                     if (LOG.isDebugEnabled()) {
-                        LOG.error(String.format("writeTargetValue()() failed for %s:%s",
+                        LOG.error(String.format("writeTargetValue() failed for %s:%s",
                                 targetField.getDocId(), targetField.getPath()), e);
                     }
                     return;
@@ -846,6 +883,17 @@ public class DefaultAtlasContext implements AtlasContext, AtlasContextMXBean {
         DefaultAtlasSession session = (DefaultAtlasSession) userSession;
         if (LOG.isDebugEnabled()) {
             LOG.debug("Begin processValidation {}", session);
+        }
+
+        AtlasMapping atlasMapping = this.admHandler.getMappingDefinition();
+        String version = factory.getProperties().get(AtlasContextFactory.PROPERTY_ATLASMAP_CORE_VERSION);
+        String mappingVersion = atlasMapping.getVersion();
+        if (!validateVersion(version, mappingVersion)) {
+            AtlasUtil.addAudit((AtlasInternalSession)userSession, (Field)null,
+                String.format("Mapping definition version %s detected. It may not work as expected with runtime version %s.",
+                    mappingVersion,
+                    version),
+                AuditStatus.WARN, null);
         }
 
         List<Validation> validations = getContextFactory().getValidationService().validateMapping(session.getMapping());
