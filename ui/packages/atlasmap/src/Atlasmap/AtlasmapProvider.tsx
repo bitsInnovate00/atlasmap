@@ -93,6 +93,8 @@ import {
   notificationsReducer,
   DataActionPayload,
 } from "./reducers";
+import { MappingModel } from "@atlasmap/core";
+// import { MappingModel } from "@atlasmap/core";
 
 // the document payload with get from Syndesis
 export interface IExternalDocumentProps {
@@ -455,10 +457,81 @@ export function useAtlasmap() {
     },
     [onLoading],
   );
-
-  const displayAIAtlasMapping = useCallback(() => {
+  //bittu pseudocode
+  const displayAIAtlasMapping = useCallback(async () => {
     //alert('showAI AtlasMapping ');
-    showAIAtlasMapping();
+    const recommendation = await showAIAtlasMapping();
+    
+
+      console.log(recommendation);
+       for (const mapping of recommendation.mappings) {
+      // const targetField = MappingUtil.getFieldByPath(
+      //   mapping.outputField.path,
+      //   initializationService.cfg.targetDocs[0].allFields,
+      // );
+      // const sourceField = MappingUtil.getFieldByPath(
+      //   mapping.inputField.path,
+      //   initializationService.cfg.sourceDocs[0].terminalFields,
+      // );
+      // console.log(mapping.inputField.path);
+      // console.log(initializationService.cfg.sourceDocs[0].terminalFields);
+
+      // console.log(" source field retrieved  ");
+      // console.log(sourceField);
+      // console.log(" target field retrieved  ");
+      // console.log(targetField);
+      // console.log("Terminal ")
+      // console.log(targetField.isTerminal());
+      // console.log(targetField.name);
+
+      
+      if(mapping.targetInputField != null && mapping.targetOutputField != null  && mapping.targetInputField.name !== undefined && 
+        mapping.targetOutputField.name !== undefined ) {
+        console.log("inside the mapping")
+        if(mapping.targetOutputField.isTerminal()) {
+          console.log("target output iis terminal field")
+        createMapping(mapping.targetInputField, mapping.targetOutputField);
+        }else {
+          console.log("target output not terminal field")
+        //  console.log(mapping.targetOutputField);
+        //  console.log(mapping.targetInputField); 
+        //  const targetProperty= createProperty(mapping.targetOutputField.name, "STRING", "current", false, false);
+        //  createMapping(mapping.targetInputField, targetProperty);
+        }
+        let mappingModel: MappingModel | null = initializationService.cfg.mappings!.activeMapping; // TODO: check this non null operator
+        if (mappingModel) {
+          mappingModel.setRecommendation(mapping.recommendationScore);
+        }
+        
+      }
+    }
+
+    // const onCreateProperty = useCallback(
+    //   (
+    //     isSource: boolean,
+    //     properties: IAtlasmapDocument | null,
+    //     addToActiveMapping?: boolean,
+    //   ) => {
+    //     setScopeOptions(getPropertyScopeOptions(isSource));
+    //     openCreatePropertyDialog(({ name, valueType, scope }) => {
+    //       createProperty(name, valueType, scope, isSource, addToActiveMapping);
+    //     }, properties);
+    //   },
+    //   [createProperty, openCreatePropertyDialog],
+    // );
+
+    // console.log(" Recommendation in atlasmap provider " + { recommendations });
+    
+
+    // for (const mapping of recommendations.mappings) {
+    //   const targetField = MappingUtil.getFieldByPath(
+    //     mapping.outputField.path,
+    //     initializationService.cfg.targetDocs[0].terminalFields,
+    //   );
+    //   console.log(" target field retrieved  ");
+    //   console.log(targetField);
+    //   createMapping(mapping.inputField, mapping.outputField);
+    // }
   }, []);
 
   const handleResetAtlasmap = useCallback(() => {

@@ -20,6 +20,7 @@ import { TransitionModel } from './transition.model';
 import { DataMapperUtil } from '../common/data-mapper-util';
 import { FieldAction } from './field-action.model';
 import { PaddingField } from './document-definition.model';
+import { RecommendationMapping } from './recommendation.model';
 
 export class MappedFieldParsingData {
   parsedName: string | null = null;
@@ -80,7 +81,7 @@ export class MappedField {
 export class MappingModel {
   cfg: ConfigModel;
   uuid: string;
-
+  recommendation: string = 'MEDIUM';
   sourceFields: MappedField[] = [];
   targetFields: MappedField[] = [];
   referenceFields: MappedField[] = [];
@@ -91,6 +92,29 @@ export class MappingModel {
     this.cfg = ConfigModel.getConfig();
   }
 
+  setRecommendation(score: string) {
+    let scoreRecommendation: string = 'MEDIUM';
+    let slashIndex = score.indexOf('/');
+    if (slashIndex > 0) {
+      let hardIndex = score.indexOf('hard');
+      let hardScore: number = Number(score.substring(0, hardIndex));
+      let softIndex = score.indexOf('soft');
+      let softScore: number = Number(
+        score.substring(slashIndex + 1, softIndex)
+      );
+      if (hardIndex > 10) {
+        scoreRecommendation = 'HIGH';
+      } else if (hardIndex > 5) {
+        scoreRecommendation = 'MEDIUM';
+      } else {
+        scoreRecommendation = 'LOW';
+      }
+      this.recommendation = scoreRecommendation;
+    }
+  }
+  getRecommendation(): string {
+    return this.recommendation;
+  }
   getFirstCollectionField(isSource: boolean): Field | null {
     for (const f of isSource ? this.sourceFields : this.targetFields) {
       if (f.field && f.field.isInCollection()) {

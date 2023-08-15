@@ -37,10 +37,10 @@ public class RecommendationRequest implements Serializable {
     protected String sourceArtifactId;
     protected String targetArtifactId;
     protected Integer mappingDefinitionId;
-    protected RecommendationField[] sourceFields;
-    protected RecommendationField[] targetFields;
+    protected Field[] sourceFields;
+    protected Field[] targetFields;
     
-    protected RecommendationField field;
+    protected Field field;
     public String getSourceArtifactId() {
         return sourceArtifactId;
     }
@@ -53,10 +53,10 @@ public class RecommendationRequest implements Serializable {
     public void setTargetArtifactId(String targetArtifactId) {
         this.targetArtifactId = targetArtifactId;
     }
-    public RecommendationField getField() {
+    public Field getField() {
         return field;
     }
-    public void setField(RecommendationField field) {
+    public void setField(Field field) {
         this.field = field;
     }
    
@@ -68,16 +68,17 @@ public class RecommendationRequest implements Serializable {
     }
 
     
-    public RecommendationField[] getSourceFields() {
+    public Field[] getSourceFields() {
         return sourceFields;
     }
-    public void setSourceFields(RecommendationField[] sourceFields) {
+
+    public void setSourceFields(Field[] sourceFields) {
         this.sourceFields = sourceFields;
     }
-    public RecommendationField[] getTargetFields() {
+    public Field[] getTargetFields() {
         return targetFields;
     }
-    public void setTargetFields(RecommendationField[] targetFields) {
+    public void setTargetFields(Field[] targetFields) {
         this.targetFields = targetFields;
     }
     @Override

@@ -433,4 +433,17 @@ at URI ${mappedField.parsedData.parsedDocURI}`,
     }
     return '';
   }
+
+  static getFieldByPath(path: string, fieldArr: Field[]): Field {
+    let resultField: Field = new Field();
+    // Field.alphabetizeFields(fields);
+    const paths: string[] = [];
+    for (const field of fieldArr) {
+      if (field.path === path) {
+        resultField = field;
+        break;
+      }
+    }
+    return resultField;
+  }
 }

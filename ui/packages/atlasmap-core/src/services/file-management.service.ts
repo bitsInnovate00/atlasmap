@@ -33,6 +33,7 @@ import { timeout } from 'rxjs/operators';
 
 import { DocumentDefinition } from '../models/document-definition.model';
 import { RecommendationField } from '../models/recommendation.model';
+import { Field } from '../models/field.model';
 
 /**
  * Handles file manipulation stored in the backend, including import/export via UI.
@@ -359,6 +360,7 @@ export class FileManagementService {
     let sourceGroupId = 'cetai';
     let targetArtifactId = 'iflyres_shopping_v1';
     let targetGroupId = 'cetai';
+    // let jsonTypeStr = 'io.atlasmap.v2.RecommendationField';
     console.log(this.cfg);
     // const sourceDocDefn: DocumentDefinition = null;
     // if (this.cfg.sourceDocs) {
@@ -391,6 +393,10 @@ export class FileManagementService {
       // var tmpField:RecommendationField = { field.path,};
       // tmpField.path=field.path;
       // tmpField.name=field.name;
+      // const fieldCopy=field.copy();
+
+      // fieldCopy.children =[];
+      // fieldCopy.parentField = new Field();
       if (field.children.length == 0) {
         sourceArray.push(new RecommendationField(field));
       }
@@ -400,6 +406,9 @@ export class FileManagementService {
 
     this.cfg.targetDocs[0].allFields.forEach((field) => {
       if (field.children.length == 0) {
+        // const fieldCopy=field.copy();
+        // fieldCopy.children =[];
+        // fieldCopy.parentField = new Field();
         targetArray.push(new RecommendationField(field));
       }
     });
@@ -409,7 +418,7 @@ export class FileManagementService {
     );
 
     console.log(' filtered souce array count' + sourceArray.length);
-    console.log(targetArray);
+    // console.log(targetArray);
     return {
       RecommendationRequest: {
         sourceArtifactId: sourceArtifactId,
@@ -417,7 +426,10 @@ export class FileManagementService {
         mappingDefinitionId: this.cfg.mappingDefinitionId,
         sourceFields: sourceArray,
         targetFields: targetArray,
-        field: {},
+        // jsonType: jsonTypeStr,
+        field: {
+          jsonType: 'io.atlasmap.v2.RecommendationField',
+        },
       },
     };
   }
@@ -487,9 +499,9 @@ export class FileManagementService {
         .post(baseURL, options)
         .json()
         .then((responseJson: any) => {
-          this.cfg.logger!.debug(
-            `AI Recommendation Response: ${JSON.stringify(responseJson)}`
-          );
+          // this.cfg.logger!.debug(
+          //   `AI Recommendation Response: ${JSON.stringify(responseJson)}`
+          // );
 
           observer.next(responseJson);
           observer.complete();
@@ -705,7 +717,7 @@ export class FileManagementService {
           } catch (error) {
             this.cfg.errorService.addError(
               new ErrorInfo({
-                message: `Unable to import the catalog file: ${mappingsFileName} ${error.message}`,
+                message: `Unable to import the catalog file: ${mappingsFileName} ${error}`,
                 level: ErrorLevel.ERROR,
                 scope: ErrorScope.APPLICATION,
                 type: ErrorType.INTERNAL,
@@ -791,6 +803,7 @@ export class FileManagementService {
    */
   private getCurrentMappingJson(): Observable<any> {
     return new Observable<any>((observer: any) => {
+      console.log('getCurrentMappingJson');
       const baseURL: string =
         this.cfg.initCfg.baseMappingServiceUrl + 'mapping/JSON/';
       this.api

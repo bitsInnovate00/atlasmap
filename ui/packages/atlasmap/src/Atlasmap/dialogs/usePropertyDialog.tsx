@@ -34,6 +34,8 @@ export function usePropertyDialog(
   const { state, toggleOn, toggleOff } = useToggle(false);
   const onConfirm = useCallback(
     (property: IProperty) => {
+      console.log("property set");
+      console.log(property)
       if (onPropertyCb) {
         onPropertyCb(property);
         toggleOff();

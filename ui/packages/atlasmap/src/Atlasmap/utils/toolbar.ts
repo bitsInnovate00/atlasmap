@@ -63,9 +63,13 @@ export function exportAtlasFile(fileName: string) {
  * @param cfg
  */
 
-export function showAIAtlasMapping() {
+export async function showAIAtlasMapping() {
   const cfg = ConfigModel.getConfig();
-  return cfg.fileService.showAIAtlasMapping();
+  const recommendation= await cfg.mappingService.showAIAtlasMapping();
+
+
+  
+  return recommendation;
 }
 
 /**
