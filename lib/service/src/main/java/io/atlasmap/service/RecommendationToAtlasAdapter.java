@@ -22,18 +22,18 @@ public class RecommendationToAtlasAdapter {
         recommendation.getMappings().stream().forEach(recommendationMapping -> {
             Mapping atlasmapping=new Mapping();
             Field atlasinputField=new XmlField();
-            RecommendationField recommendationinputField=recommendationMapping.getInputField();
+            RecommendationField recommendationinputField=(RecommendationField) recommendationMapping.getInputField();
             atlasinputField.setFieldType(FieldType.STRING);
             atlasinputField.setName(recommendationinputField.getName());
-            atlasinputField.setPath(recommendationinputField.getFieldPath());
+            atlasinputField.setPath(recommendationinputField.getPath());
             atlasinputField.setDocId(source.getId());
             atlasmapping.getInputField().add(atlasinputField);
 
             Field atlasoutputField=new XmlField();
-            RecommendationField recommendationoutputField=recommendationMapping.getOutputField();
+            RecommendationField recommendationoutputField=(RecommendationField) recommendationMapping.getOutputField();
             atlasoutputField.setFieldType(FieldType.STRING);
             atlasoutputField.setName(recommendationoutputField.getName());
-            atlasoutputField.setPath(recommendationoutputField.getFieldPath());
+            atlasoutputField.setPath(recommendationoutputField.getPath());
             atlasoutputField.setDocId(target.getId());
             atlasmapping.getOutputField().add(atlasoutputField);
             mapping.getMappings().getMapping().add(atlasmapping);

@@ -18,24 +18,26 @@ package io.atlasmap.v2;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+// @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS, property = "jsonType")
 // @JsonRootName("RecommendationField")
 // @JsonTypeInfo(include = JsonTypeInfo.As.PROPERTY, use = JsonTypeInfo.Id.CLASS, property = "jsonType")
-public class RecommendationField implements Serializable {
+public class RecommendationField extends Field implements Serializable {
     
     
     protected String nativeFieldId;
-    protected String fieldPath;
-    protected String name;
+    // protected String fieldPath;
+    // protected String name;
     @JsonIgnore
     protected String artifactId;
-    protected String fieldType;
+    // protected String fieldType;
     private Integer minLength;
     private Integer maxLength;
     @JsonIgnore
     private String dataFormat;
-    @JsonIgnore
-    private String[] values;
+    // @JsonIgnore
+    // private String[] values;
     //Need to derive from values column using Janusgraph master data api
     @JsonIgnore
     private String[] derivedValueTypes;
@@ -107,13 +109,13 @@ public class RecommendationField implements Serializable {
 
 
 
-    public String getFieldPath() {
-        return fieldPath;
-    }
+    // public String getFieldPath() {
+    //     return fieldPath;
+    // }
 
-    public void setFieldPath(String fieldPath) {
-        this.fieldPath = fieldPath;
-    }
+    // public void setFieldPath(String fieldPath) {
+    //     this.fieldPath = fieldPath;
+    // }
 
     public String getName() {
         return name;
@@ -131,13 +133,13 @@ public class RecommendationField implements Serializable {
         this.artifactId = artifactId;
     }
 
-    public String getFieldType() {
-        return fieldType;
-    }
+    // public String getFieldType() {
+    //     return fieldType;
+    // }
 
-    public void setFieldType(String fieldType) {
-        this.fieldType = fieldType;
-    }
+    // public void setFieldType(String fieldType) {
+    //     this.fieldType = fieldType;
+    // }
 
 
 
@@ -149,13 +151,13 @@ public class RecommendationField implements Serializable {
         this.dataFormat = dataFormat;
     }
 
-    public String[] getValues() {
-        return values;
-    }
+    // public String[] getValues() {
+    //     return values;
+    // }
 
-    public void setValues(String[] values) {
-        this.values = values;
-    }
+    // public void setValues(String[] values) {
+    //     this.values = values;
+    // }
 
     public String getBusinessContext() {
         return businessContext;
@@ -175,7 +177,7 @@ public class RecommendationField implements Serializable {
 
     @Override
     public String toString() {
-        return "RecommendationField [artifactId=" + artifactId + ", fieldPath=" + fieldPath + ", fieldType=" + fieldType
+        return "RecommendationField [artifactId=" + artifactId +  ", fieldType=" + fieldType
                 + ", name=" + name + "]";
     }
 
@@ -208,7 +210,7 @@ public class RecommendationField implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((nativeFieldId == null) ? 0 : nativeFieldId.hashCode());
-        result = prime * result + ((fieldPath == null) ? 0 : fieldPath.hashCode());
+        // result = prime * result + ((fieldPath == null) ? 0 : fieldPath.hashCode());
         result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
     }
@@ -228,11 +230,11 @@ public class RecommendationField implements Serializable {
                 return false;
         } else if (!nativeFieldId.equals(other.nativeFieldId))
             return false;
-        if (fieldPath == null) {
-            if (other.fieldPath != null)
-                return false;
-        } else if (!fieldPath.equals(other.fieldPath))
-            return false;
+        // if (fieldPath == null) {
+        //     if (other.fieldPath != null)
+        //         return false;
+        // } else if (!fieldPath.equals(other.fieldPath))
+        //     return false;
         if (name == null) {
             if (other.name != null)
                 return false;

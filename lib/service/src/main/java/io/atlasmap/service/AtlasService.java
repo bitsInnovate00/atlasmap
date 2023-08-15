@@ -58,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.atlasmap.api.AtlasContext;
@@ -74,12 +75,14 @@ import io.atlasmap.service.AtlasLibraryLoader.AtlasLibraryLoaderListener;
 import io.atlasmap.v2.ActionDetails;
 import io.atlasmap.v2.AtlasMapping;
 import io.atlasmap.v2.Audits;
+import io.atlasmap.v2.Field;
 import io.atlasmap.v2.Json;
 import io.atlasmap.v2.Mapping;
 import io.atlasmap.v2.MappingFileType;
 import io.atlasmap.v2.ProcessMappingRequest;
 import io.atlasmap.v2.ProcessMappingResponse;
 import io.atlasmap.v2.Recommendation;
+import io.atlasmap.v2.RecommendationField;
 import io.atlasmap.v2.StringMap;
 import io.atlasmap.v2.StringMapEntry;
 import io.atlasmap.v2.Validations;
@@ -167,47 +170,99 @@ public class AtlasService {
       public Response listAIAtlasMappings(InputStream inputStream) throws AtlasException{
   
         RecommendationRequest recommendationRequest = fromJson(inputStream, RecommendationRequest.class);
-          System.out.println(" The input mapping as json1 " + recommendationRequest);
-        //  Client client= ClientBuilder.newBuilder().build();
-        //  WebTarget target = client.target("http://localhost:9999/fieldmapping");
-        //  Recommendation recommendations=target.request(MediaType.APPLICATION_JSON).post(Entity.json(recommendationRequest), Recommendation.class);
-        //  client.close();
-         ObjectMapper mapper=new ObjectMapper();
-         Recommendation recommendations=null;
+        RecommendationField inputField=(RecommendationField) recommendationRequest.getSourceFields()[0];
+
+        Field[] targetFields=(Field[]) recommendationRequest.getTargetFields();
+        Field[] sourceFields=(Field[]) recommendationRequest.getSourceFields();
+        // RecommendationField[] fieldArray= new RecommendationField[2];
+        // fieldArray[0]=inputField;
+        // for(int i=1; i < recommendationRequest.getSourceFields().length;i++)
+        // {
+        //     RecommendationField field=(RecommendationField) recommendationRequest.getSourceFields()[i];
+        //     if(field.isLeafNode())
+        //     {
+        //         fieldArray[1]=field;
+        //         break;
+        //     }
+        // }
+       
+        // fieldArray[1]=(RecommendationField) recommendationRequest.getSourceFields()[1];
+        // recommendationRequest.setSourceFields(fieldArray);
+        ObjectMapper mapper=new ObjectMapper();
+        String recommendationString=null;
+        Recommendation recommendations=null;
+        // recommendationString="{\"sourceArtifactId\":null,\"targetArtifactId\":null,\"mappings\":[{\"inputField\":{\"jsonType\":\"io.atlasmap.v2.RecommendationField\",\"actions\":null,\"value\":null,\"arrayDimensions\":null,\"arraySize\":null,\"collectionType\":null,\"docId\":null,\"index\":null,\"path\":\"Air_MultiAvailability/frequentTraveller/travellerDetails/otherPaxDetails/givenName\",\"required\":null,\"status\":null,\"fieldType\":\"STRING\",\"format\":null,\"name\":\"givenName\",\"nativeFieldId\":\"14\",\"minLength\":-1,\"maxLength\":1,\"leafNode\":true,\"hierarchyDepth\":4},\"outputField\":{\"jsonType\":\"io.atlasmap.v2.RecommendationField\",\"actions\":null,\"value\":null,\"arrayDimensions\":null,\"arraySize\":null,\"collectionType\":null,\"docId\":null,\"index\":null,\"path\":\"IATA_AirShoppingRQ/Request/PaxList/Pax/Individual/GivenName\",\"required\":null,\"status\":null,\"fieldType\":null,\"format\":null,\"name\":\"GivenName\",\"nativeFieldId\":\"14\",\"minLength\":null,\"maxLength\":null,\"leafNode\":true,\"hierarchyDepth\":4},\"recommendationScore\":\"142hard/1982soft\"},{\"inputField\":{\"jsonType\":\"io.atlasmap.v2.RecommendationField\",\"actions\":null,\"value\":null,\"arrayDimensions\":null,\"arraySize\":null,\"collectionType\":null,\"docId\":null,\"index\":null,\"path\":\"Air_MultiAvailability/requestSection/availabilityProductInfo/availabilityDetails/departureDate\",\"required\":null,\"status\":null,\"fieldType\":null,\"format\":null,\"name\":\"departureDate\",\"nativeFieldId\":\"0\",\"minLength\":null,\"maxLength\":null,\"leafNode\":false,\"hierarchyDepth\":0},\"outputField\":{\"jsonType\":\"io.atlasmap.v2.RecommendationField\",\"actions\":null,\"value\":null,\"arrayDimensions\":null,\"arraySize\":null,\"collectionType\":null,\"docId\":null,\"index\":null,\"path\":\"IATA_AirShoppingRQ/Request/FlightRequest/FlightRequestOriginDestinationsCriteria/OriginDestCriteria/DestArrivalCriteria/Date\",\"required\":null,\"status\":null,\"fieldType\":null,\"format\":null,\"name\":\"Date\",\"nativeFieldId\":\"0\",\"minLength\":null,\"maxLength\":null,\"leafNode\":true,\"hierarchyDepth\":4},\"recommendationScore\":\"24hard/1192soft\"}]}";
         try {
-            recommendations = mapper.readValue(new File("/home/bittu/work/cetai-org/atlasmap/lib/service/recommendation.json"), Recommendation.class);
-        } catch (IOException e1) {
+          System.out.println(" The input mapping as jsons " + recommendationRequest);
+         Client client= ClientBuilder.newBuilder().build();
+         WebTarget target = client.target("http://localhost:9999/fieldmapping");
+         
+          recommendationString=target.request(MediaType.TEXT_PLAIN).post(Entity.text(mapper.writeValueAsString(recommendationRequest)), String.class);
+         client.close();
+                  
+         
+       
+            recommendations = mapper.readValue(recommendationString,Recommendation.class);
+        } catch (JsonMappingException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (JsonProcessingException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+
+        //  ObjectMapper mapper=new ObjectMapper();
+        //  Recommendation recommendations=null;
+        // try {
+        //     recommendations = mapper.readValue(new File("/home/bittu/work/cetai-org/atlasmap/lib/service/recommendation.json"), Recommendation.class);
+        // } catch (IOException e1) {
+        //     // TODO Auto-generated catch block
+        //     e1.printStackTrace();
+        // }
+    
+        System.out.println(" Recommendations before modifying are "+ recommendations);
+        // recommendations.getMappings().stream().forEach(recommendationMapping -> {
+
+        //     RecommendationField sourceField=findTargetFieldFromTargetSource((RecommendationField) recommendationMapping.getInputField(),sourceFields);
+        //     recommendationMapping.setInputField(sourceField);
+
+        //     RecommendationField targetField=findTargetFieldFromTargetSource((RecommendationField) recommendationMapping.getOutputField(),targetFields);
+        //     recommendationMapping.setOutputField(targetField);
+            
+            
+            
+        // });
+        System.out.println("##########################################");
          System.out.println(" Recommendations are "+ recommendations);
-         ADMArchiveHandler admHandler = loadExplodedMappingDirectory(recommendationRequest.getMappingDefinitionId());
-        AtlasMapping mapping = admHandler.getMappingDefinition();
-        AtlasContext context = atlasContextFactory.createContext(mapping);
-        AtlasSession session = context.createSession();
-        System.out.println("session details " + session.getDefaultSourceDocument());
-        // Recommendation ndcRecommendation=RecommendationToAtlasAdapter.convertNDCMapping(recommendations,recommendationRequest.getTargetFields());
-        RecommendationToAtlasAdapter.covertMapping(mapping, recommendations,recommendationRequest.getSourceFields(),recommendationRequest.getTargetFields());
-        admHandler.setMappingDefinition(mapping);
-        admHandler.persist();
-        byte[] serialized = null;
-            try {
-                serialized = admHandler.getMappingDefinitionBytes();
-            } catch (Exception e) {
-                LOG.error("Error retrieving mapping definition file for ID:" + recommendationRequest.getMappingDefinitionId(), e);
-                throw new WebApplicationException(e.getMessage(), e, Status.INTERNAL_SERVER_ERROR);
-            }
-            if (LOG.isDebugEnabled() && serialized != null) {
-                LOG.debug(new String(serialized));
-            }
-            if (serialized == null) {
-                LOG.debug("Mapping definition not found for ID:{}", recommendationRequest.getMappingDefinitionId());
-                return Response.noContent().build();
-            }
+        //  ADMArchiveHandler admHandler = loadExplodedMappingDirectory(recommendationRequest.getMappingDefinitionId());
+        // AtlasMapping mapping = admHandler.getMappingDefinition();
+        // AtlasContext context = atlasContextFactory.createContext(mapping);
+        // AtlasSession session = context.createSession();
+        // System.out.println("session details " + session.getDefaultSourceDocument());
+        // // Recommendation ndcRecommendation=RecommendationToAtlasAdapter.convertNDCMapping(recommendations,recommendationRequest.getTargetFields());
+        // RecommendationToAtlasAdapter.covertMapping(mapping, recommendations);
+
+        // admHandler.setMappingDefinition(mapping);
+        // admHandler.persist();
+        // byte[] serialized = null;
+        //     try {
+        //         serialized = admHandler.getMappingDefinitionBytes();
+        //     } catch (Exception e) {
+        //         LOG.error("Error retrieving mapping definition file for ID:" + recommendationRequest.getMappingDefinitionId(), e);
+        //         throw new WebApplicationException(e.getMessage(), e, Status.INTERNAL_SERVER_ERROR);
+        //     }
+        //     if (LOG.isDebugEnabled() && serialized != null) {
+        //         LOG.debug(new String(serialized));
+        //     }
+        //     if (serialized == null) {
+        //         LOG.debug("Mapping definition not found for ID:{}", recommendationRequest.getMappingDefinitionId());
+        //         return Response.noContent().build();
+        //     }
 
             
 
-            return Response.ok().entity(serialized).build();
+            return Response.ok().entity(recommendations).build();
+            
       
         //   ResteasyClient client = new ResteasyClientBuilder().build();
         //   ResteasyWebTarget target = client.target("http://172.20.87.91:9999/aimapper");
@@ -290,7 +345,31 @@ public class AtlasService {
           
       }
   
-      private byte[] readIntoByteArray(InputStream in) throws Exception {
+      private RecommendationField findTargetFieldFromTargetSource(RecommendationField targetField, Field[] targetFields) {
+        RecommendationField resultField=null;
+        for(Field field:targetFields)
+        {
+            if(targetField.getName().equals(field.getName())&& targetField.getPath().equals(cleanseFieldPath(field.getPath())))
+            {
+                resultField=(RecommendationField) field;
+                break;
+            }
+        }
+        return resultField;
+    }
+
+    private String cleanseFieldPath(String fieldPath)
+    {
+        
+        String cleansedpath=fieldPath.replaceAll("\\/[a-z]+:", "/");
+        cleansedpath=cleansedpath.replaceAll("\\/Air_","Air_");
+        cleansedpath=cleansedpath.replaceAll("<>", "");
+        cleansedpath=cleansedpath.replaceAll("\\[\\]", "");
+        
+        return cleansedpath.charAt(0) == '/'?cleansedpath.substring(1):cleansedpath;
+    }
+
+    private byte[] readIntoByteArray(InputStream in) throws Exception {
           try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
               redirectStream(in, baos);
               return baos.toByteArray();

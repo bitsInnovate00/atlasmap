@@ -26,8 +26,9 @@ import {
 } from '../contracts/mapping';
 import { LookupTableData, LookupTableUtil } from '../utils/lookup-table-util';
 import { MappedField, MappingModel } from '../models/mapping.model';
-import { Subject, Subscription } from 'rxjs';
 
+import { Observable, Subscription, Subject, forkJoin, from } from 'rxjs';
+import { timeout } from 'rxjs/operators';
 import { CommonUtil } from '../utils/common-util';
 import { ConfigModel } from '../models/config.model';
 import { Field } from '../models/field.model';
@@ -41,6 +42,11 @@ import { PaddingField } from '../models/document-definition.model';
 import { TransitionMode } from '../models/transition.model';
 import ky from 'ky';
 import log from 'loglevel';
+import {
+  Recommendation,
+  RecommendationField,
+  RecommendationMapping,
+} from '../models/recommendation.model';
 
 /**
  * Handles mapping updates. It restores mapping status from backend and reflect in UI,
@@ -874,5 +880,304 @@ export class MappingManagementService {
    */
   isEnumerationMapping(mapping: MappingModel): boolean {
     return mapping.transition.mode === TransitionMode.ENUM;
+  }
+
+  private createRecommendationRequest(): any {
+    let sourceArtifactId = 'ndcshopping19.2';
+    let sourceGroupId = 'cetai';
+    let targetArtifactId = 'iflyres_shopping_v1';
+    let targetGroupId = 'cetai';
+    // let jsonTypeStr = 'io.atlasmap.v2.RecommendationField';
+    console.log(this.cfg);
+    // const sourceDocDefn: DocumentDefinition = null;
+    // if (this.cfg.sourceDocs) {
+    //   const sourceDocDefn: DocumentDefinition = this.cfg.sourceDocs[0];
+    //   console.log(' souce document ' + sourceDocDefn.inspectionSource);
+    //   this.registerAPI(sourceDocDefn.inspectionSource, sourceArtifactId)
+    //     .toPromise()
+    //     .then(({ artifactId, groupId }) => {
+    //       console.log(artifactId + ': ' + groupId);
+    //       sourceArtifactId = artifactId;
+    //       sourceGroupId = groupId;
+    //     });
+    // }
+    // if (this.cfg.targetDocs) {
+    //   const targetDocDefn: DocumentDefinition = this.cfg.targetDocs[0];
+    //   console.log(' target document ' + targetDocDefn.inspectionResult);
+
+    //   this.registerAPI(targetDocDefn.inspectionSource, targetArtifactId)
+    //     .toPromise()
+    //     .then(({ artifactId, groupId }) => {
+    //       console.log(artifactId + ': ' + groupId);
+    //       targetArtifactId = artifactId;
+    //       targetGroupId = groupId;
+    //     });
+    // }
+
+    var sourceArray: RecommendationField[] = [];
+
+    this.cfg.sourceDocs[0].allFields.forEach((field) => {
+      // var tmpField:RecommendationField = { field.path,};
+      // tmpField.path=field.path;
+      // tmpField.name=field.name;
+      // const fieldCopy=field.copy();
+
+      // fieldCopy.children =[];
+      // fieldCopy.parentField = new Field();
+      if (field.children.length == 0) {
+        sourceArray.push(new RecommendationField(field));
+      }
+    });
+
+    var targetArray: RecommendationField[] = [];
+
+    // this.cfg.targetDocs[0].allFields.forEach((field) => {
+    //   // if (field.children.length == 0) {
+    //   // const fieldCopy=field.copy();
+    //   // fieldCopy.children =[];
+    //   // fieldCopy.parentField = new Field();
+    //   targetArray.push(new RecommendationField(field));
+    //   // }
+    // });
+
+    console.log(
+      ' souce array count ' + this.cfg.sourceDocs[0].allFields.length
+    );
+
+    console.log(' filtered souce array count' + sourceArray.length);
+    // console.log(targetArray);
+    return {
+      RecommendationRequest: {
+        sourceArtifactId: sourceArtifactId,
+        targetArtifactId: targetArtifactId,
+        mappingDefinitionId: this.cfg.mappingDefinitionId,
+        sourceFields: sourceArray,
+        targetFields: targetArray,
+        // jsonType: jsonTypeStr,
+        field: {
+          jsonType: 'io.atlasmap.v2.RecommendationField',
+        },
+      },
+    };
+  }
+
+  // async showAIAtlasMapping(): Promise<Recommendation> {
+  //   return new Promise<Recommendation>(async (resolve) => {
+  //     console.log('showAIAtlasMapping in file service bittu ');
+  //     //  console.log({sampledata})
+
+  //     const RecommendationRequest = this.createRecommendationRequest();
+  //     console.log(RecommendationRequest);
+  //     const recommendation = this.getAIRecommendation(RecommendationRequest)
+  //       .toPromise()
+  //       .then((response: Recommendation) => {
+  //         console.log(
+  //           'Got the final AtlasMappings ' + JSON.stringify(response)
+  //         );
+  //         resolve(response);
+  //       });
+
+  //     // await this.notifyMappingUpdated();
+  //     resolve(recommendation);
+  //   });
+  // }
+
+  async showAIAtlasMapping(): Promise<Recommendation> {
+    return new Promise<Recommendation>(async (resolve) => {
+      console.log('showAIAtlasMapping in file service bittu ');
+      //  console.log({sampledata})
+
+      const RecommendationRequest = this.createRecommendationRequest();
+      console.log(RecommendationRequest);
+      const recommendation = await this.getAIRecommendation(
+        RecommendationRequest
+      );
+      console.log(recommendation);
+      const updRecommendation = this.getCompatibleRecommendationMapping(
+        recommendation,
+        this.cfg.sourceDocs[0].allFields,
+        this.cfg.targetDocs[0].allFields
+      );
+      console.log(updRecommendation);
+      resolve(updRecommendation);
+    });
+  }
+
+  getCompatibleRecommendationMapping(
+    recommendation: Recommendation,
+    sourceFieldArr: Field[],
+    targetFieldArr: Field[]
+  ): Recommendation {
+    var finalRecomm: Recommendation = new Recommendation();
+    finalRecomm.soruceArtifactid = recommendation.soruceArtifactid;
+    finalRecomm.targetArtifactid = recommendation.targetArtifactid;
+    var mappingArray: RecommendationMapping[] = [];
+    for (const mapping of recommendation.mappings) {
+      const sourceField = this.findTargetFieldFromTargetSource(
+        mapping.inputField,
+        sourceFieldArr
+      );
+      const targetField = this.findTargetFieldFromTargetSource(
+        mapping.outputField,
+        targetFieldArr
+      );
+      mapping.targetInputField = sourceField;
+      mapping.targetOutputField = targetField;
+      mappingArray.push(mapping);
+    }
+    finalRecomm.mappings = mappingArray;
+
+    return finalRecomm;
+  }
+
+  findTargetFieldFromTargetSource(
+    field: RecommendationField,
+    fieldArray: Field[]
+  ): Field {
+    var targetField = new Field();
+    for (const inputField of fieldArray) {
+      // if(targetField.getName().equals(field.getName())&& targetField.getPath().equals(cleanseFieldPath(field.getPath())))
+      if (
+        field.name === inputField.name &&
+        field.path === this.cleanseFieldPath(inputField.path)
+      ) {
+        targetField = inputField;
+        break;
+      }
+    }
+    return targetField;
+  }
+
+  cleanseFieldPath(path: string): string {
+    console.log('cleanseFieldPath ');
+    console.log(' Input Path' + path);
+
+    var cleansedpath = path
+      .replace(/tns:/g, '')
+      .replace(/cns:/g, '')
+      .replace('/Air_', 'Air_')
+      .replace(/<>/g, '')
+      .replace(/\[\]/g, '');
+    // cleansedpath = cleansedpath.replace(/cns:/g, '');
+    // cleansedpath = cleansedpath.replace('/Air_', 'Air_');
+    // // String cleansedpath=fieldPath.replaceAll("\\/[a-z]+:", "/");
+    // // cleansedpath=cleansedpath.replaceAll("\\/Air_","Air_");
+    // cleansedpath = cleansedpath.replace(/<>/g, '');
+    // cleansedpath = cleansedpath.replace(/[]/g, '');
+    var finalpath =
+      cleansedpath.charAt(0) == '/' ? cleansedpath.substring(1) : cleansedpath;
+
+    console.log(finalpath);
+    return finalpath;
+    // throw new Error('Function not implemented.');
+  }
+
+  async getAIRecommendation(request: any): Promise<Recommendation> {
+    return new Promise<Recommendation>(async (resolve, reject) => {
+      const recommendation = this.getAIRecommendationAsync(request)
+        .toPromise()
+        .then((response: Recommendation) => {
+          console.log(
+            'Got the final AtlasMappings ' + JSON.stringify(response)
+          );
+          // setTimeout(resolve, 60000);
+          resolve(response);
+        })
+        .catch((error: any) => {
+          if (error.status === 0) {
+            this.cfg.errorService.addError(
+              new ErrorInfo({
+                message: 'Fatal timeout error: Field Mapping failed.',
+                level: ErrorLevel.ERROR,
+                scope: ErrorScope.APPLICATION,
+                type: ErrorType.INTERNAL,
+                object: error,
+              })
+            );
+          } else {
+            this.cfg.errorService.addError(
+              new ErrorInfo({
+                message: `Fatal timeout error: Field Mapping failed.: ${error.status} ${error.statusText}`,
+                level: ErrorLevel.ERROR,
+                scope: ErrorScope.APPLICATION,
+                type: ErrorType.INTERNAL,
+                object: error,
+              })
+            );
+          }
+          reject();
+        });
+    });
+  }
+
+  // private getAIRecommendationJson(request: any): Observable<any> {
+  //   return new Observable<any>((observer: any) => {
+  //     const baseURL: string =
+  //       this.cfg.initCfg.baseMappingServiceUrl + 'AtlasMapping/';
+  //       const headers = { 'Content-Type': 'application/json' };
+  //       let options: any = { json: request, headers: headers };
+
+  //     this.api
+  //       .get(baseURL)
+  //       .json()
+  //       .then((body: any) => {
+  //         this.cfg.logger!.debug(
+  //           `Mapping Service Response: ${JSON.stringify(body)}`
+  //         );
+  //         if (body) {
+  //           observer.next(body);
+  //         } else {
+  //           observer.next(undefined);
+  //         }
+  //         observer.complete();
+  //       })
+  //       .catch((error: any) => {
+  //         if (error.status !== DataMapperUtil.HTTP_STATUS_NO_CONTENT) {
+  //           this.handleError(
+  //             'Error occurred while accessing the current mappings from the backend service.',
+  //             error
+  //           );
+  //           observer.error(error);
+  //         }
+  //         observer.complete();
+  //       });
+  //   });
+  // }
+
+  getAIRecommendationAsync(request: any): Observable<Recommendation> {
+    return new Observable<Recommendation>((observer: any) => {
+      const headers = { 'Content-Type': 'application/json' };
+      // const headers = { 'Content-Type': 'text/plain' , 'Accept': 'text/plain'};
+
+      const requestStr=JSON.stringify(request);
+      console.log("request sending ")
+      console.log(requestStr)
+      // let url: string = 'http://localhost:8080/apis/registry/v2/groups/cetai/artifacts?ifExists=RETURN';
+      let options: any = { body: requestStr, headers: headers ,timeout: false};
+      const baseURL: string =
+        this.cfg.initCfg.baseMappingServiceUrl + 'recommendations/';
+      console.log(" making changes in getAIRecommendation %%%%%%%%%%%%%%%%%%");
+      // const baseURL: string =
+      //   'https://24d48852-8559-4813-b561-b923f70d287e.mock.pstmn.io/fieldmapping';
+
+      this.api
+        .post(baseURL, options)
+        .json()
+        .then((responseJson: any) => {
+          // this.cfg.logger!.debug(
+          //   `AI Recommendation Response: ${JSON.stringify(responseJson)}`
+          // );
+
+          observer.next(responseJson);
+          observer.complete();
+        })
+        .catch((error: any) => {
+          console.log("error in getAIRecommendationAsync @@@@@@@@@@@@@@@@")
+          console.log(error)
+          observer.error(error);
+          observer.next();
+          observer.complete();
+        });
+    });
   }
 }

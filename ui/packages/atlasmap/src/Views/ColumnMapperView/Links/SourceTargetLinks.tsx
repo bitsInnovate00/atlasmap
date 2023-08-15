@@ -63,9 +63,9 @@ export const SourceTargetLinks: FunctionComponent<ISourceTargetLinksProps> = ({
       ))}
 
       <NodesArc
-        start={'dnd-start'}
-        end={'dnd-target-field'}
-        color={'var(--pf-global--active-color--400)'}
+        start={"dnd-start"}
+        end={"dnd-target-field"}
+        color={"var(--pf-global--success-color--100)"}
       />
     </svg>
   );
@@ -88,12 +88,28 @@ const MappingLines: FunctionComponent<IMappingLinesProps> = ({
     toggleOff: toggleHoveredOff,
   } = useToggle(false);
 
+
   const handleClick = (event: MouseEvent) => {
     onClick();
     event.stopPropagation();
   };
+  const mappingRecommendation=mapping.mapping.recommendation;
+  console.log(mappingRecommendation);
+  let color = isSelected ? "var(--pf-global--active-color--100)" : undefined;
+  if(mappingRecommendation=== "HIGH")
+  {
+     color = isSelected ? "var(--pf-global--success-color--100)" : undefined;
 
-  const color = isSelected ? 'var(--pf-global--active-color--100)' : undefined;
+  }else if(mappingRecommendation=== "MEDIUM")
+  {
+     color = isSelected ? "var(--pf-global--warning-color--100)" : undefined;
+
+  }else 
+  {
+     color = isSelected ? "var(--pf-global--danger-color--100)" : undefined;
+
+  }
+  
   const hoverColor = !isSelected
     ? 'var(--pf-global--active-color--400)'
     : undefined;

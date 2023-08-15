@@ -7,19 +7,19 @@ public class  RecommendationMapping {
 
     }
 
-    protected RecommendationField inputField;
-    protected RecommendationField outputField;
+    protected Field inputField;
+    protected Field outputField;
     protected String recommendationScore;
-    public RecommendationField getInputField() {
+    public Field getInputField() {
         return inputField;
     }
-    public void setInputField(RecommendationField inputField) {
+    public void setInputField(Field inputField) {
         this.inputField = inputField;
     }
-    public RecommendationField getOutputField() {
+    public Field getOutputField() {
         return outputField;
     }
-    public void setOutputField(RecommendationField outputField) {
+    public void setOutputField(Field outputField) {
         this.outputField = outputField;
     }
   

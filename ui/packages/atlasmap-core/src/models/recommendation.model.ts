@@ -18,7 +18,7 @@ import { Field } from '.';
 
 export class RecommendationField {
   nativeFieldId: string;
-  fieldPath: string;
+  path: string;
   name: string;
   fieldType: string;
   minLength: number;
@@ -26,6 +26,7 @@ export class RecommendationField {
   dataFormat: string;
   leafNode: boolean;
   hierarchyDepth: number;
+  jsonType: string;
   // usercreated: boolean;
   // isArray: boolean;
   // isAttribute: boolean;
@@ -35,7 +36,7 @@ export class RecommendationField {
   // artifactid: string;
 
   constructor(field: Field) {
-    this.fieldPath = field.path;
+    this.path = field.path;
     this.name = field.name;
     this.fieldType = field.type;
     this.nativeFieldId = field.uuid;
@@ -43,6 +44,7 @@ export class RecommendationField {
     this.maxLength = 1;
     this.leafNode = field.isTerminal();
     this.hierarchyDepth = field.fieldDepth;
+    this.jsonType = 'io.atlasmap.v2.RecommendationField';
 
     // this._identifier = ErrorInfo.errorIdentifierCounter.toString();
     // ErrorInfo.errorIdentifierCounter++;
@@ -54,4 +56,25 @@ export class RecommendationRequest {
   soruceArtifactid: string;
   targetArtifactid: string;
   field: RecommendationField;
+}
+
+export class RecommendationMapping {
+  inputField: RecommendationField;
+  outputField: RecommendationField;
+  targetInputField: Field;
+  targetOutputField: Field;
+  recommendationScore: string;
+}
+
+export class Recommendation {
+  soruceArtifactid: string;
+  targetArtifactid: string;
+  mappings: RecommendationMapping[] = [];
+
+  constructor() {
+    this.soruceArtifactid = '';
+    this.targetArtifactid = '';
+    var mappingArray: RecommendationMapping[] = [];
+    this.mappings = mappingArray;
+  }
 }

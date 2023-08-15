@@ -60,6 +60,7 @@ export class DocumentManagementService {
       this.cfg.mappingService.mappingUpdated$.subscribe(() => {
         for (const d of this.cfg.getAllDocs()) {
           if (d.initialized) {
+            console.log('mappingUpdatedSubscription');
             d.updateFromMappings(this.cfg.mappings!); // TODO: check this non null operator
           }
         }

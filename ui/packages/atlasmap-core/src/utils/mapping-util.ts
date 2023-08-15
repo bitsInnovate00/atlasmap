@@ -350,4 +350,17 @@ with ID ${mappedField.mappingField.docId}`,
   static isConstantField(field: IField) {
     return field?.jsonType === CONSTANT_FIELD_JSON_TYPE;
   }
+
+  static getFieldByPath(path: string, fieldArr: Field[]): Field {
+    let resultField: Field = new Field();
+    // Field.alphabetizeFields(fields);
+    const paths: string[] = [];
+    for (const field of fieldArr) {
+      if (field.path === path) {
+        resultField = field;
+        break;
+      }
+    }
+    return resultField;
+  }
 }

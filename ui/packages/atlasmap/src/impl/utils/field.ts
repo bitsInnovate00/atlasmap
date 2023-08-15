@@ -71,22 +71,44 @@ export function getConstantTypeIndex(constName: string): number {
   const cfg = ConfigModel.getConfig();
   return cfg.documentService.getConstantTypeIndex(constName);
 }
-
+//bittu createProperty
 export function createProperty(
   propName: string,
   propType: string,
   propScope: string,
   isSource: boolean,
   addToActiveMapping?: boolean,
-): void {
+): Field {
   const cfg = ConfigModel.getConfig();
-  cfg.documentService.createProperty(
-    propName,
-    propType,
-    propScope,
-    isSource,
-    addToActiveMapping,
-  );
+  let field = isSource
+    ? cfg.sourcePropertyDoc.getField(
+        cfg.sourcePropertyDoc.pathSeparator + propName,
+        propScope,
+      )
+    : cfg.targetPropertyDoc.getField(
+        cfg.sourcePropertyDoc.pathSeparator + propName,
+        propScope,
+      );
+  if (!field) {
+    field = new Field();
+  }
+  field.name = propName;
+  field.type = propType;
+  field.scope = propScope;
+  field.userCreated = true;
+
+  if (isSource) {
+    field.docDef = cfg.sourcePropertyDoc;
+    cfg.sourcePropertyDoc.addField(field);
+  } else {
+    field.docDef = cfg.targetPropertyDoc;
+    cfg.targetPropertyDoc.addField(field);
+  }
+  if (addToActiveMapping) {
+    addToCurrentMapping(field);
+  }
+  cfg.mappingService.notifyMappingUpdated();
+  return field;
 }
 
 export function deleteProperty(
@@ -145,16 +167,37 @@ export function getPropertyTypeIndex(
  * @param source
  * @param target
  */
+//bittu
 export function createMapping(source: Field | undefined, target?: Field): void {
+  console.log(source);
+  console.log(target);
   const cfg = ConfigModel.getConfig();
   const ms = initializationService.cfg.mappingService;
 
   if (target) {
     if (
+      !cfg.mappings?.activeMapping &&
+      (source?.partOfMapping || target.partOfMapping)
+    ) {
+      console.log("error part");
+      cfg.errorService.addError(
+        new ErrorInfo({
+          message: `Unable to map '${source!.name}/${
+            target.name
+          }'.  Please select a mapping before adding to it.`,
+          level: ErrorLevel.INFO,
+          scope: ErrorScope.MAPPING,
+          type: ErrorType.USER,
+        }),
+      );
+      return;
+    }
+    if (
       source &&
       cfg.mappings?.activeMapping &&
       (source.partOfMapping || target.partOfMapping)
     ) {
+      console.log("second error part");
       let exclusionReason = null;
 
       if (!source.partOfMapping) {
@@ -181,15 +224,19 @@ export function createMapping(source: Field | undefined, target?: Field): void {
         );
         return;
       }
+      // console.log(target.partOfMapping);
+      console.log(cfg.mappings.activeMapping);
+      // console.log(cfg.mappings.activeMapping.targetFields[0]!.field!.path);
+      // console.log(target!.path);
       if (
-        target.partOfMapping &&
+        target.partOfMapping && cfg.mappings.activeMapping.targetFields[0] &&
         cfg.mappings.activeMapping.targetFields[0]!.field!.path === target!.path
       ) {
         addToCurrentMapping(source);
         return;
       }
       if (
-        source.partOfMapping &&
+        source.partOfMapping && cfg.mappings.activeMapping.sourceFields[0] &&
         cfg.mappings.activeMapping.sourceFields[0]!.field!.path === source!.path
       ) {
         addToCurrentMapping(target);
@@ -198,11 +245,14 @@ export function createMapping(source: Field | undefined, target?: Field): void {
     }
   }
   if (source) {
+    console.log("if source ")
     cfg.mappingService.addNewMapping(source, false);
   } else {
+    console.log("else if source ")
     cfg.mappingService.newMapping();
   }
   if (target) {
+    console.log("if target ")
     addToCurrentMapping(target);
   }
 }
