@@ -103,6 +103,25 @@ public class ExpressionTest {
     }
 
     @Test
+    public void testCopyParent() throws Exception {
+        System.setProperty("logging.level.io.atlasmap", "debug");
+        URL url = Thread.currentThread().getContextClassLoader().getResource("mappings/copyparent/cetai-collection-thirdarray.json");
+        AtlasContext context = DefaultAtlasContextFactory.getInstance().createContext(url.toURI());
+        AtlasSession session = context.createSession();
+         String source = new String(Files.readAllBytes(Paths.get(
+            Thread.currentThread().getContextClassLoader().getResource("mappings/copyparent/cetai-collection-input-thirdarray.xml").toURI())));
+        session.setSourceDocument("source-063520f5-7425-4a8d-abed-d08a0bcdbce6", source);
+        context.process(session);
+        // session.setSourceDocument("io.atlasmap.itests.core.issue.SourceClass", new SourceClass().setSourceInteger(-1));
+        // context.process(session);
+        System.out.println(TestHelper.printAudit(session));
+        // assertFalse(TestHelper.printAudit(session), session.hasWarns());
+        Object output = session.getTargetDocument("target-b806f5a9-e3c6-47a0-83c9-ce41e742f300");
+        System.out.println(" Output "+output);
+        // assertEquals(TargetClass.class, output.
+    }
+
+    @Test
     public void testAction() throws Exception {
         URL url = Thread.currentThread().getContextClassLoader().getResource("mappings/atlasmapping-expression2-action.json");
         AtlasContext context = DefaultAtlasContextFactory.getInstance().createContext(url.toURI());

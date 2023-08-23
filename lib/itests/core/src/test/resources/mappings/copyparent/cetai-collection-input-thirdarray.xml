@@ -1,0 +1,31 @@
+<root>
+  <sampleValue>hello</sampleValue>
+  <firstArray>
+    <firstvalue>firstArrayValue0</firstvalue>
+    <secondArray>
+      <secondvalue>secondArrayValue0-0</secondvalue>
+      <thirdArray>
+          <thirdvalue>thirdArrayValue0-0-0</thirdvalue>
+      </thirdArray>
+    </secondArray>
+    <secondArray>
+      <secondvalue>secondArrayValue0-1</secondvalue>
+    </secondArray>
+  </firstArray>
+  <firstArray>
+    <firstvalue>firstArrayValue1</firstvalue>
+    <secondArray>
+      <secondvalue>secondArrayValue1-0</secondvalue>
+    </secondArray>
+    <secondArray>
+      <secondvalue>secondArrayValue1-1</secondvalue>
+    </secondArray>
+    <secondArray>
+      <secondvalue>secondArrayValue1-2</secondvalue>
+      <thirdArray>
+        <thirdvalue>thirdArrayValue1-2-3</thirdvalue>
+    </thirdArray>
+    </secondArray>
+    
+  </firstArray>
+</root> 
