@@ -480,7 +480,7 @@ public class AtlasUtil {
     /**
      * Delete specified directory and the contents in it.
      * @see #deleteDirectoryContents
-     * @param targetDir
+     * @param targetDir target directory
      */
     public static void deleteDirectory(File targetDir) {
         File[] allContents = targetDir.listFiles();
@@ -501,7 +501,7 @@ public class AtlasUtil {
      * Delete all contents in the specified directory.
      * 
      * @see #deleteDirectory
-     * @param targetDir
+     * @param targetDir target direcotry
      */
     public static void deleteDirectoryContents(File targetDir) {
         File[] allContents = targetDir.listFiles();

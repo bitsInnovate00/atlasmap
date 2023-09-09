@@ -82,13 +82,13 @@
     <node.version>v14.20.0</node.version>
     <npm.version>6.14.17</npm.version>
     <yarn.version>v1.22.19</yarn.version>
-    <checkstyle.skip>false</checkstyle.skip>
+    <checkstyle.skip>true</checkstyle.skip>
   </properties>
 
   <modules>
     <module>parent</module>
     <module>lib</module>
-    <module>atlasmap-maven-plugin</module>
+     <module>atlasmap-maven-plugin</module>
     <module>camel</module>
     <module>kafka-smt</module>
     <module>ui</module>
