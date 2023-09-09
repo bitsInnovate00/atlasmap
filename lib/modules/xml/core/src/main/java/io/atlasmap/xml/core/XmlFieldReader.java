@@ -255,7 +255,7 @@ public class XmlFieldReader extends XmlFieldTransformer implements AtlasFieldRea
             itemPath.setCollectionIndex(segments.size() - 1, i);
             if (field instanceof FieldGroup) {
                 FieldGroup itemGroup = AtlasXmlModelFactory.cloneFieldGroup((FieldGroup)field);
-                AtlasPath.setCollectionIndexRecursively(itemGroup, segments.size(), i);
+                AtlasPath.setCollectionIndexRecursively(itemGroup, segments.size()-1, i);
                 populateChildFields(session, xmlNamespaces, elements.get(i), itemGroup, itemPath);
                 group.getField().add(itemGroup);
             } else {
