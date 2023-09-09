@@ -17,8 +17,10 @@ package io.atlasmap.v2;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -311,6 +313,34 @@ public class AtlasModelFactory {
         } else {
             return f.getValue();
         }
+    }
+
+     public static Stream<Field> unwrapFieldGroup(Field field) {
+        if (field == null) {
+            return null;
+        }
+        if (field instanceof FieldGroup) {
+
+            List<Field> childFields=((FieldGroup)field).getField();
+            if(childFields !=null && !childFields.isEmpty())
+            {
+                return childFields.stream().flatMap(AtlasModelFactory::unwrapFieldGroup);
+                // List<Field> flatFields = new ArrayList<>();
+                // for (Field childField : childFields) {
+                //     if (childField instanceof FieldGroup) {
+                //         return unwrapFieldGroup(childField);
+                //     }else {
+                //         flatFields.add(childField);
+                //     }    
+                // }
+                // return flatFields.stream();
+            }
+           
+        } else {
+
+             return Stream.of(field);
+        }
+        return null;
     }
 
 }
