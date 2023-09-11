@@ -19,10 +19,14 @@ import {
   ErrorLevel,
   ErrorScope,
   ErrorType,
+  FIELD_PATH_SEPARATOR,
   Field,
+  FieldType,
   MappedField,
   MappingModel,
 } from '@atlasmap/core';
+
+// import { FieldType, IField } from '../contracts/common';
 
 import { LookupTableData } from '../../UI';
 import { initializationService } from './ui';
@@ -82,18 +86,18 @@ export function createProperty(
   const cfg = ConfigModel.getConfig();
   let field = isSource
     ? cfg.sourcePropertyDoc.getField(
-        cfg.sourcePropertyDoc.pathSeparator + propName,
-        propScope,
+      FIELD_PATH_SEPARATOR + propName
+        
       )
     : cfg.targetPropertyDoc.getField(
-        cfg.sourcePropertyDoc.pathSeparator + propName,
-        propScope,
-      );
+      FIELD_PATH_SEPARATOR + propName,
+     );
   if (!field) {
     field = new Field();
   }
   field.name = propName;
-  field.type = propType;
+  // field.type = propType;
+  field.type = FieldType[propType as keyof typeof FieldType];
   field.scope = propScope;
   field.userCreated = true;
 
