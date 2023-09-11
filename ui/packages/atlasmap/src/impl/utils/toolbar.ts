@@ -140,6 +140,6 @@ export function toggleShowUnmappedFields(enabled: boolean) {
 
 export function showAIAtlasMapping() {
   const cfg = ConfigModel.getConfig();
-  return cfg.fileService.showAIAtlasMapping();
+  return cfg.mappingService.showAIAtlasMapping();
 }
 
