@@ -1,0 +1,29 @@
+{
+  "sourceArtifactId": null,
+  "targetArtifactId": null,
+  "mappings": [
+    {
+      "inputField": {
+        "nativeFieldId": "0",
+        "fieldPath": "/Air_MultiAvailability/requestSection/boardOffDetails/boardOffPoints/departureLocationInfo/modifier",
+        "name": "modifier",
+        "fieldType": null,
+        "minLength": null,
+        "maxLength": null,
+        "leafNode": false,
+        "hierarchyDepth": 0
+      },
+      "outputField": {
+        "nativeFieldId": "0",
+        "fieldPath": "/IATA_AirShoppingRQ/Request/FlightRelatedCriteria/AllianceCriteria/Alliance/Carrier/Name",
+        "name": "Name",
+        "fieldType": "NameType",
+        "minLength": -1,
+        "maxLength": -1,
+        "leafNode": true,
+        "hierarchyDepth": 7
+      },
+      "recommendationScore": "12soft"
+    }
+  ]
+}

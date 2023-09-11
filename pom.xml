@@ -66,6 +66,8 @@
   </distributionManagement>
 
   <properties>
+    <!-- <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target> -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <frontend-maven-plugin.version>1.12.1</frontend-maven-plugin.version>
     <license-maven-plugin.version>4.1</license-maven-plugin.version>
@@ -79,10 +81,16 @@
     <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.7</nexus-staging-maven-plugin.version>
-    <node.version>v14.20.0</node.version>
+    
+     <node.version>v14.20.0</node.version>
     <npm.version>6.14.17</npm.version>
     <yarn.version>v1.22.19</yarn.version>
-    <checkstyle.skip>true</checkstyle.skip>
+    <checkstyle.skip>true</checkstyle.skip> 
+    <!-- TODO: working node version so commenting for future reference -->
+    <!--<node.version>v12.16.3</node.version>
+    <npm.version>6.14.5</npm.version>
+    <yarn.version>v1.22.4</yarn.version>
+    <checkstyle.skip>true</checkstyle.skip> -->
   </properties>
 
   <modules>

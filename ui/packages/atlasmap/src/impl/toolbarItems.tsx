@@ -29,6 +29,7 @@ import {
   PlusIcon,
   TableIcon,
   TrashIcon,
+  BrainIcon,
 } from '@patternfly/react-icons';
 import {
   Button,
@@ -474,6 +475,28 @@ export const AboutToolbarItem: FunctionComponent<{
         data-testid="about-button"
       >
         <HelpIcon />
+      </Button>
+    </Tooltip>
+  </ToolbarItem>
+);
+
+
+export const ShowAIAtlasMappingToolbarItem: FunctionComponent<{
+  onClick: () => void;
+}> = ({ onClick }) => (
+  <ToolbarItem>
+    <Tooltip
+      position={"auto"}
+      enableFlip={true}
+      content={<div>Show AI AtlasMapping</div>}
+    >
+      <Button
+        variant={"plain"}
+        aria-label="Show AI AtlasMapping"
+        onClick={onClick}
+        data-testid="show-ai-AtlasMapping-button"
+      >
+        <BrainIcon />
       </Button>
     </Tooltip>
   </ToolbarItem>

@@ -76,6 +76,13 @@
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
     </dependency>
+<!-- changes added by bittu-->
+
+ <!-- core library -->
+  
+ 
+  <!-- changes added by bittu -->
+
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
@@ -94,12 +101,12 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <scope>test</scope>
+      <!-- <scope>test</scope> -->
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-client</artifactId>
-      <scope>test</scope>
+      <!-- <scope>test</scope> -->
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>

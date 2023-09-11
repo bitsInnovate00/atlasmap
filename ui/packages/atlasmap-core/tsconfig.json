@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
-    "lib": ["dom", "esnext"],
+    "lib": ["dom", "esnext", "ES2020.String"],
     "importHelpers": true,
     "declaration": true,
     "declarationMap": true,
@@ -24,6 +24,7 @@
     "baseUrl": "./",
     "jsx": "react",
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "target": "ES6"
   }
 }

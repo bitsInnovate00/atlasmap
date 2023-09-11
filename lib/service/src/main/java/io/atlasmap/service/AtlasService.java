@@ -17,7 +17,11 @@ package io.atlasmap.service;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -34,6 +38,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -41,10 +49,17 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.spi.ResteasyConfiguration;
+// import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+// import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.atlasmap.api.AtlasContext;
 import io.atlasmap.api.AtlasContextFactory;
@@ -60,14 +75,18 @@ import io.atlasmap.service.AtlasLibraryLoader.AtlasLibraryLoaderListener;
 import io.atlasmap.v2.ActionDetails;
 import io.atlasmap.v2.AtlasMapping;
 import io.atlasmap.v2.Audits;
+import io.atlasmap.v2.Field;
 import io.atlasmap.v2.Json;
 import io.atlasmap.v2.Mapping;
 import io.atlasmap.v2.MappingFileType;
 import io.atlasmap.v2.ProcessMappingRequest;
 import io.atlasmap.v2.ProcessMappingResponse;
+import io.atlasmap.v2.Recommendation;
+import io.atlasmap.v2.RecommendationField;
 import io.atlasmap.v2.StringMap;
 import io.atlasmap.v2.StringMapEntry;
 import io.atlasmap.v2.Validations;
+import io.atlasmap.v2.RecommendationRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -101,7 +120,6 @@ public class AtlasService {
         else {
             baseFolder = "target";
         }
-
         mappingFolder = baseFolder + File.separator + "mappings";
         libFolder = baseFolder + File.separator + "lib";
 
@@ -139,6 +157,233 @@ public class AtlasService {
         }
         this.previewContext = atlasContextFactory.createPreviewContext();
     }
+
+      // bittu
+
+      // TO do   1. atlasmapping object along with the request and complete the output
+         
+
+      @POST
+      @Path("/recommendations")
+      @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.APPLICATION_OCTET_STREAM })
+      @Produces(MediaType.APPLICATION_JSON)
+      public Response listAIAtlasMappings(InputStream inputStream) throws AtlasException{
+  
+        RecommendationRequest recommendationRequest = fromJson(inputStream, RecommendationRequest.class);
+        RecommendationField inputField=(RecommendationField) recommendationRequest.getSourceFields()[0];
+
+        Field[] targetFields=(Field[]) recommendationRequest.getTargetFields();
+        Field[] sourceFields=(Field[]) recommendationRequest.getSourceFields();
+        // RecommendationField[] fieldArray= new RecommendationField[2];
+        // fieldArray[0]=inputField;
+        // for(int i=1; i < recommendationRequest.getSourceFields().length;i++)
+        // {
+        //     RecommendationField field=(RecommendationField) recommendationRequest.getSourceFields()[i];
+        //     if(field.isLeafNode())
+        //     {
+        //         fieldArray[1]=field;
+        //         break;
+        //     }
+        // }
+       
+        // fieldArray[1]=(RecommendationField) recommendationRequest.getSourceFields()[1];
+        // recommendationRequest.setSourceFields(fieldArray);
+        ObjectMapper mapper=new ObjectMapper();
+        String recommendationString=null;
+        Recommendation recommendations=null;
+        // recommendationString="{\"sourceArtifactId\":null,\"targetArtifactId\":null,\"mappings\":[{\"inputField\":{\"jsonType\":\"io.atlasmap.v2.RecommendationField\",\"actions\":null,\"value\":null,\"arrayDimensions\":null,\"arraySize\":null,\"collectionType\":null,\"docId\":null,\"index\":null,\"path\":\"Air_MultiAvailability/frequentTraveller/travellerDetails/otherPaxDetails/givenName\",\"required\":null,\"status\":null,\"fieldType\":\"STRING\",\"format\":null,\"name\":\"givenName\",\"nativeFieldId\":\"14\",\"minLength\":-1,\"maxLength\":1,\"leafNode\":true,\"hierarchyDepth\":4},\"outputField\":{\"jsonType\":\"io.atlasmap.v2.RecommendationField\",\"actions\":null,\"value\":null,\"arrayDimensions\":null,\"arraySize\":null,\"collectionType\":null,\"docId\":null,\"index\":null,\"path\":\"IATA_AirShoppingRQ/Request/PaxList/Pax/Individual/GivenName\",\"required\":null,\"status\":null,\"fieldType\":null,\"format\":null,\"name\":\"GivenName\",\"nativeFieldId\":\"14\",\"minLength\":null,\"maxLength\":null,\"leafNode\":true,\"hierarchyDepth\":4},\"recommendationScore\":\"142hard/1982soft\"},{\"inputField\":{\"jsonType\":\"io.atlasmap.v2.RecommendationField\",\"actions\":null,\"value\":null,\"arrayDimensions\":null,\"arraySize\":null,\"collectionType\":null,\"docId\":null,\"index\":null,\"path\":\"Air_MultiAvailability/requestSection/availabilityProductInfo/availabilityDetails/departureDate\",\"required\":null,\"status\":null,\"fieldType\":null,\"format\":null,\"name\":\"departureDate\",\"nativeFieldId\":\"0\",\"minLength\":null,\"maxLength\":null,\"leafNode\":false,\"hierarchyDepth\":0},\"outputField\":{\"jsonType\":\"io.atlasmap.v2.RecommendationField\",\"actions\":null,\"value\":null,\"arrayDimensions\":null,\"arraySize\":null,\"collectionType\":null,\"docId\":null,\"index\":null,\"path\":\"IATA_AirShoppingRQ/Request/FlightRequest/FlightRequestOriginDestinationsCriteria/OriginDestCriteria/DestArrivalCriteria/Date\",\"required\":null,\"status\":null,\"fieldType\":null,\"format\":null,\"name\":\"Date\",\"nativeFieldId\":\"0\",\"minLength\":null,\"maxLength\":null,\"leafNode\":true,\"hierarchyDepth\":4},\"recommendationScore\":\"24hard/1192soft\"}]}";
+        try {
+          System.out.println(" The input mapping as jsons " + recommendationRequest);
+         Client client= ClientBuilder.newBuilder().build();
+         WebTarget target = client.target("http://localhost:9999/fieldmapping");
+         
+          recommendationString=target.request(MediaType.TEXT_PLAIN).post(Entity.text(mapper.writeValueAsString(recommendationRequest)), String.class);
+         client.close();
+                  
+         
+       
+            recommendations = mapper.readValue(recommendationString,Recommendation.class);
+        } catch (JsonMappingException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        } catch (JsonProcessingException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+
+        //  ObjectMapper mapper=new ObjectMapper();
+        //  Recommendation recommendations=null;
+        // try {
+        //     recommendations = mapper.readValue(new File("/home/bittu/work/cetai-org/atlasmap/lib/service/recommendation.json"), Recommendation.class);
+        // } catch (IOException e1) {
+        //     // TODO Auto-generated catch block
+        //     e1.printStackTrace();
+        // }
+    
+        System.out.println(" Recommendations before modifying are "+ recommendations);
+        // recommendations.getMappings().stream().forEach(recommendationMapping -> {
+
+        //     RecommendationField sourceField=findTargetFieldFromTargetSource((RecommendationField) recommendationMapping.getInputField(),sourceFields);
+        //     recommendationMapping.setInputField(sourceField);
+
+        //     RecommendationField targetField=findTargetFieldFromTargetSource((RecommendationField) recommendationMapping.getOutputField(),targetFields);
+        //     recommendationMapping.setOutputField(targetField);
+            
+            
+            
+        // });
+        System.out.println("##########################################");
+         System.out.println(" Recommendations are "+ recommendations);
+        //  ADMArchiveHandler admHandler = loadExplodedMappingDirectory(recommendationRequest.getMappingDefinitionId());
+        // AtlasMapping mapping = admHandler.getMappingDefinition();
+        // AtlasContext context = atlasContextFactory.createContext(mapping);
+        // AtlasSession session = context.createSession();
+        // System.out.println("session details " + session.getDefaultSourceDocument());
+        // // Recommendation ndcRecommendation=RecommendationToAtlasAdapter.convertNDCMapping(recommendations,recommendationRequest.getTargetFields());
+        // RecommendationToAtlasAdapter.covertMapping(mapping, recommendations);
+
+        // admHandler.setMappingDefinition(mapping);
+        // admHandler.persist();
+        // byte[] serialized = null;
+        //     try {
+        //         serialized = admHandler.getMappingDefinitionBytes();
+        //     } catch (Exception e) {
+        //         LOG.error("Error retrieving mapping definition file for ID:" + recommendationRequest.getMappingDefinitionId(), e);
+        //         throw new WebApplicationException(e.getMessage(), e, Status.INTERNAL_SERVER_ERROR);
+        //     }
+        //     if (LOG.isDebugEnabled() && serialized != null) {
+        //         LOG.debug(new String(serialized));
+        //     }
+        //     if (serialized == null) {
+        //         LOG.debug("Mapping definition not found for ID:{}", recommendationRequest.getMappingDefinitionId());
+        //         return Response.noContent().build();
+        //     }
+
+            
+
+            return Response.ok().entity(recommendations).build();
+            
+      
+        //   ResteasyClient client = new ResteasyClientBuilder().build();
+        //   ResteasyWebTarget target = client.target("http://172.20.87.91:9999/aimapper");
+        //   Response response1 = target.request().post(Entity.entity(user, "application/vnd.com.demo.user-management.user+xml;charset=UTF-8;version=1"));
+        //   //Read output in string format
+        //   System.out.println(response1.getStatus());
+        //   response1.close();  
+
+         
+        //   StringBuffer response = new StringBuffer();
+        //   try {
+        //       URL url = new URL("http://192.168.153.165:9999/aimapper");
+        //       HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        //       con.setRequestMethod("POST");
+        //       con.setRequestProperty("Content-Type", "application/json; utf-8");
+        //       con.setRequestProperty("Accept", "application/json");
+        //       con.setDoOutput(true);
+        //       DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+        //       wr.write(readIntoByteArray(inputStream));
+        //       wr.flush();
+        //       wr.close();
+  
+        //       int responseCode = con.getResponseCode();
+        //       System.out.println("nSending 'POST' request to UL : " + url);
+        //       System.out.println("Post Data : " + recommendationRequest);
+        //       System.out.println("Response Code : " + responseCode);
+  
+        //       BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        //       String output;
+             
+  
+        //       while ((output = in.readLine()) != null) {
+        //           response.append(output);
+        //       }
+        //       in.close();
+  
+        //       // printing result from response
+        //       System.out.println(response.toString());
+        //       Recommendation recommendation =  Json.withClassLoader(this.libraryLoader).readValue(response.toString(), Recommendation.class);
+
+        //       System.out.println("##########recommendation ##########"+recommendation);
+        //   } catch (Exception e) {
+        //       e.printStackTrace();
+        //   }
+
+        
+          /// additional
+        //   StringMap sMap = new StringMap();
+        // LOG.debug("listMappings with filter '{}'", filter);
+
+        // ADMArchiveHandler handler = loadExplodedMappingDirectory(mappingDefinitionId);
+        // AtlasMapping map = handler.getMappingDefinition();
+        // if (map == null) {
+        //     return Response.ok().entity(toJson(sMap)).build();
+        // }
+        // StringMapEntry mapEntry = new StringMapEntry();
+        // mapEntry.setName(map.getName());
+        // UriBuilder builder = uriInfo.getBaseUriBuilder().path("v2").path("atlas").path("mapping")
+        //     .path(map.getName());
+        // mapEntry.setValue(builder.build().toString());
+        // sMap.getStringMapEntry().add(mapEntry);
+
+        // byte[] serialized = toJson(sMap);
+        // if (LOG.isDebugEnabled()) {
+        //     LOG.debug(new String(serialized));
+        // }
+        // return Response.ok().entity(serialized).build();
+  
+          // ResteasyClient client = new ResteasyClientBuilder().build();
+          // ResteasyWebTarget target = client.target(UriBuilder.fromPath(path));
+          // ServicesInterface proxy = target.proxy(ServicesInterface.class);
+  
+          // POST
+          // Response moviesResponse = proxy.addMovie();
+          // System.out.println("HTTP code: " + moviesResponse.getStatus());
+          // moviesResponse.close();
+  
+          // external AI call
+          // conversion
+          
+      }
+  
+      private RecommendationField findTargetFieldFromTargetSource(RecommendationField targetField, Field[] targetFields) {
+        RecommendationField resultField=null;
+        for(Field field:targetFields)
+        {
+            if(targetField.getName().equals(field.getName())&& targetField.getPath().equals(cleanseFieldPath(field.getPath())))
+            {
+                resultField=(RecommendationField) field;
+                break;
+            }
+        }
+        return resultField;
+    }
+
+    private String cleanseFieldPath(String fieldPath)
+    {
+        
+        String cleansedpath=fieldPath.replaceAll("\\/[a-z]+:", "/");
+        cleansedpath=cleansedpath.replaceAll("\\/Air_","Air_");
+        cleansedpath=cleansedpath.replaceAll("<>", "");
+        cleansedpath=cleansedpath.replaceAll("\\[\\]", "");
+        
+        return cleansedpath.charAt(0) == '/'?cleansedpath.substring(1):cleansedpath;
+    }
+
+    private byte[] readIntoByteArray(InputStream in) throws Exception {
+          try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+              redirectStream(in, baos);
+              return baos.toByteArray();
+          }
+      }
+  
+      private void redirectStream(InputStream in, OutputStream out) throws Exception {
+          int len = 0;
+          byte[] buffer = new byte[2048];
+          while ((len = in.read(buffer)) > 0) {
+              out.write(buffer, 0, len);
+          }
+      }
+
 
     @GET
     @Path("/fieldActions")
@@ -698,7 +943,7 @@ public class AtlasService {
 
     private <T> T fromJson(InputStream value, Class<T>clazz) {
         try {
-            if (LOG.isDebugEnabled()) {
+            // if (LOG.isDebugEnabled()) {
                 BufferedReader reader = new BufferedReader(new InputStreamReader(value));
                 StringBuffer buf = new StringBuffer();
                 String line;
@@ -707,8 +952,8 @@ public class AtlasService {
                 }
                 LOG.debug(buf.toString());
                 return Json.withClassLoader(this.libraryLoader).readValue(buf.toString(), clazz);
-            }
-            return Json.withClassLoader(this.libraryLoader).readValue(value, clazz);
+            // }
+            // return Json.withClassLoader(this.libraryLoader).readValue(value, clazz);
         } catch (IOException e) {
             throw new WebApplicationException(e, Status.BAD_REQUEST);
         }
