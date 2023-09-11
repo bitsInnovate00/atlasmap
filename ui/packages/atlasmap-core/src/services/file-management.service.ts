@@ -48,6 +48,7 @@ export enum FileType {
 import { DocumentDefinition } from '../models/document-definition.model';
 import { RecommendationField } from '../models/recommendation.model';
 import { Field } from '../models/field.model';
+import { Observable } from 'rxjs';
 
 /**
  * Handles file manipulation stored in the backend, including import/export via UI.
