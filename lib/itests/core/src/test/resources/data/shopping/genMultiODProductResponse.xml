@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<tns:AirShopResponse xmlns:tns="http://www.iata.org/IATA/2015/EASD/00/IATA_OffersAndOrdersMessage">
+    <tns:Response>
+        <tns:EntityLists>
+            <tns:OriginDestList>
+                <tns:OriginDest>
+                    <tns:OriginDestID>1</tns:OriginDestID>
+                    <tns:OriginCode>FRA</tns:OriginCode>
+                    <tns:DestCode>AYT</tns:DestCode>
+                    <tns:JourneyRefID>1</tns:JourneyRefID>
+                    <tns:JourneyRefID>2</tns:JourneyRefID>
+                </tns:OriginDest>
+                <tns:OriginDest>
+                    <tns:OriginDestID>1</tns:OriginDestID>
+                    <tns:OriginCode>ABC</tns:OriginCode>
+                    <tns:DestCode>BCD</tns:DestCode>
+                    <tns:JourneyRefID>10</tns:JourneyRefID>
+                    <tns:JourneyRefID>20</tns:JourneyRefID>
+                </tns:OriginDest>
+            </tns:OriginDestList>
+            <tns:JourneyList>
+                <tns:Journey>
+                    <tns:JourneyID>1</tns:JourneyID>
+                    <tns:SegmentRefID>1</tns:SegmentRefID>
+                    <tns:SegmentRefID>2</tns:SegmentRefID>
+                    <tns:Duration>03:25</tns:Duration>
+                </tns:Journey>
+                <tns:Journey>
+                    <tns:JourneyID>2</tns:JourneyID>
+                    <tns:SegmentRefID>1</tns:SegmentRefID>
+                    <tns:SegmentRefID>20</tns:SegmentRefID>
+                    <tns:Duration>03:25</tns:Duration>
+                </tns:Journey>
+                <tns:Journey>
+                    <tns:JourneyID>10</tns:JourneyID>
+                    <tns:Duration>03:25</tns:Duration>
+                </tns:Journey>
+                <tns:Journey>
+                    <tns:JourneyID>20</tns:JourneyID>
+                    <tns:Duration>03:25</tns:Duration>
+                </tns:Journey>
+            </tns:JourneyList>
+            <tns:BaggageAllowanceList>
+                <tns:BaggageAllowance>
+                    <tns:JourneyRefID />
+                </tns:BaggageAllowance>
+                <tns:BaggageAllowance>
+                    <tns:JourneyRefID />
+                </tns:BaggageAllowance>
+                <tns:BaggageAllowance>
+                    <tns:JourneyRefID />
+                </tns:BaggageAllowance>
+                <tns:BaggageAllowance>
+                    <tns:JourneyRefID />
+                </tns:BaggageAllowance>
+            </tns:BaggageAllowanceList>
+            <tns:FlightMarketingSegmentList>
+                <tns:FlightMarketingSegment>
+                    <tns:FlightMarketingSegmentId>1</tns:FlightMarketingSegmentId>
+                    <tns:CarrierDesigCode>V1</tns:CarrierDesigCode>
+                    <tns:MarketingCarrierFlightNumberText>141</tns:MarketingCarrierFlightNumberText>
+                    <tns:Departure>
+                        <tns:LocationCode>FRA</tns:LocationCode>
+                        <tns:AircraftScheduledDateTime>Fri Nov 15 19:15:00 IST 2019</tns:AircraftScheduledDateTime>
+                        <tns:TerminalName />
+                    </tns:Departure>
+                    <tns:OperationalSuffixText>*</tns:OperationalSuffixText>
+                    <tns:Arrival>
+                        <tns:TerminalName />
+                        <tns:LocationCode>AYT</tns:LocationCode>
+                        <tns:AircraftScheduledDateTime>Sat Nov 16 00:40:00 IST 2019</tns:AircraftScheduledDateTime>
+                    </tns:Arrival>
+                    <tns:RichMedia>
+                        <tns:ResourceURI />
+                    </tns:RichMedia>
+                    <tns:RichMedia>
+                        <tns:ResourceURI />
+                    </tns:RichMedia>
+                </tns:FlightMarketingSegment>
+                <tns:FlightMarketingSegment>
+                    <tns:FlightMarketingSegmentId>2</tns:FlightMarketingSegmentId>
+                    <tns:CarrierDesigCode>V1</tns:CarrierDesigCode>
+                    <tns:MarketingCarrierFlightNumberText>145</tns:MarketingCarrierFlightNumberText>
+                    <tns:Departure>
+                        <tns:LocationCode>FRA</tns:LocationCode>
+                        <tns:AircraftScheduledDateTime>Fri Nov 15 23:10:00 IST 2019</tns:AircraftScheduledDateTime>
+                        <tns:TerminalName />
+                    </tns:Departure>
+                    <tns:OperationalSuffixText>*</tns:OperationalSuffixText>
+                    <tns:Arrival>
+                        <tns:TerminalName />
+                        <tns:LocationCode>AYT</tns:LocationCode>
+                        <tns:AircraftScheduledDateTime>Sat Nov 16 04:35:00 IST 2019</tns:AircraftScheduledDateTime>
+                    </tns:Arrival>
+                    <tns:RichMedia>
+                        <tns:ResourceURI />
+                    </tns:RichMedia>
+                    <tns:RichMedia>
+                        <tns:ResourceURI />
+                    </tns:RichMedia>
+                </tns:FlightMarketingSegment>
+                <tns:FlightMarketingSegment>
+                    <tns:FlightMarketingSegmentId>1</tns:FlightMarketingSegmentId>
+                    <tns:CarrierDesigCode>V1</tns:CarrierDesigCode>
+                    <tns:MarketingCarrierFlightNumberText>1410</tns:MarketingCarrierFlightNumberText>
+                    <tns:Departure>
+                        <tns:LocationCode>ABC</tns:LocationCode>
+                        <tns:AircraftScheduledDateTime>Fri Nov 15 19:15:00 IST 2019</tns:AircraftScheduledDateTime>
+                        <tns:TerminalName />
+                    </tns:Departure>
+                    <tns:OperationalSuffixText>*</tns:OperationalSuffixText>
+                    <tns:Arrival>
+                        <tns:TerminalName />
+                        <tns:LocationCode>BCD</tns:LocationCode>
+                        <tns:AircraftScheduledDateTime>Sat Nov 16 00:40:00 IST 2019</tns:AircraftScheduledDateTime>
+                    </tns:Arrival>
+                </tns:FlightMarketingSegment>
+                <tns:FlightMarketingSegment>
+                    <tns:FlightMarketingSegmentId>20</tns:FlightMarketingSegmentId>
+                    <tns:CarrierDesigCode>V1</tns:CarrierDesigCode>
+                    <tns:MarketingCarrierFlightNumberText>1450</tns:MarketingCarrierFlightNumberText>
+                    <tns:Departure>
+                        <tns:LocationCode>ABC</tns:LocationCode>
+                        <tns:AircraftScheduledDateTime>Fri Nov 15 23:10:00 IST 2019</tns:AircraftScheduledDateTime>
+                        <tns:TerminalName />
+                    </tns:Departure>
+                    <tns:OperationalSuffixText>*</tns:OperationalSuffixText>
+                    <tns:Arrival>
+                        <tns:TerminalName />
+                        <tns:LocationCode>BCD</tns:LocationCode>
+                        <tns:AircraftScheduledDateTime>Sat Nov 16 04:35:00 IST 2019</tns:AircraftScheduledDateTime>
+                    </tns:Arrival>
+                </tns:FlightMarketingSegment>
+            </tns:FlightMarketingSegmentList>
+            <tns:FlightOperatingSegmentList>
+                <tns:FlightOperatingSegment>
+                    <tns:SegmentTypeCode>OPEN</tns:SegmentTypeCode>
+                </tns:FlightOperatingSegment>
+                <tns:FlightOperatingSegment>
+                    <tns:SegmentTypeCode>OPEN</tns:SegmentTypeCode>
+                </tns:FlightOperatingSegment>
+                <tns:FlightOperatingSegment>
+                    <tns:SegmentTypeCode>OPEN</tns:SegmentTypeCode>
+                </tns:FlightOperatingSegment>
+                <tns:FlightOperatingSegment>
+                    <tns:SegmentTypeCode>OPEN</tns:SegmentTypeCode>
+                </tns:FlightOperatingSegment>
+            </tns:FlightOperatingSegmentList>
+            <tns:SegmentList>
+                <tns:Segment>
+                    <tns:AircraftType>
+                        <tns:AircraftTypeCode>73H</tns:AircraftTypeCode>
+                    </tns:AircraftType>
+                    <tns:CabinTypeAssociationChoice>
+                        <tns:SegmentCabinType>
+                            <tns:CabinTypeCode>ECONOMY</tns:CabinTypeCode>
+                        </tns:SegmentCabinType>
+                    </tns:CabinTypeAssociationChoice>
+                </tns:Segment>
+                <tns:Segment>
+                    <tns:AircraftType>
+                        <tns:AircraftTypeCode>73H</tns:AircraftTypeCode>
+                    </tns:AircraftType>
+                    <tns:CabinTypeAssociationChoice>
+                        <tns:SegmentCabinType>
+                            <tns:CabinTypeCode>ECONOMY</tns:CabinTypeCode>
+                        </tns:SegmentCabinType>
+                    </tns:CabinTypeAssociationChoice>
+                </tns:Segment>
+                <tns:Segment>
+                    <tns:AircraftType>
+                        <tns:AircraftTypeCode>73H</tns:AircraftTypeCode>
+                    </tns:AircraftType>
+                    <tns:CabinTypeAssociationChoice>
+                        <tns:SegmentCabinType>
+                            <tns:CabinTypeCode>ECONOMY</tns:CabinTypeCode>
+                        </tns:SegmentCabinType>
+                    </tns:CabinTypeAssociationChoice>
+                </tns:Segment>
+                <tns:Segment>
+                    <tns:AircraftType>
+                        <tns:AircraftTypeCode>73H</tns:AircraftTypeCode>
+                    </tns:AircraftType>
+                    <tns:CabinTypeAssociationChoice>
+                        <tns:SegmentCabinType>
+                            <tns:CabinTypeCode>ECONOMY</tns:CabinTypeCode>
+                        </tns:SegmentCabinType>
+                    </tns:CabinTypeAssociationChoice>
+                </tns:Segment>
+            </tns:SegmentList>
+            <tns:PriceList>
+                <tns:PriceDetail>
+                    <tns:JourneyRefID>1</tns:JourneyRefID>
+                    <tns:PTC>ADULT</tns:PTC>
+                    <tns:PriceID>318636</tns:PriceID>
+                </tns:PriceDetail>
+                <tns:PriceDetail>
+                    <tns:JourneyRefID>2</tns:JourneyRefID>
+                    <tns:PTC>ADULT</tns:PTC>
+                    <tns:PriceID>318636</tns:PriceID>
+                </tns:PriceDetail>
+                <tns:PriceDetail>
+                    <tns:JourneyRefID>10</tns:JourneyRefID>
+                    <tns:PTC>ADULT</tns:PTC>
+                    <tns:PriceID>318636</tns:PriceID>
+                </tns:PriceDetail>
+                <tns:PriceDetail>
+                    <tns:JourneyRefID>20</tns:JourneyRefID>
+                    <tns:PTC>ADULT</tns:PTC>
+                    <tns:PriceID>318636</tns:PriceID>
+                </tns:PriceDetail>
+            </tns:PriceList>
+            <tns:FareComponentList>
+                <tns:FareComponent>
+                    <tns:FareComponentID>1</tns:FareComponentID>
+                    <tns:FareBasisCode>LINT</tns:FareBasisCode>
+                    <tns:FareTypeCode>SUNECO</tns:FareTypeCode>
+                    <tns:SegmentRefID>1</tns:SegmentRefID>
+                    <tns:SegmentRefID>2</tns:SegmentRefID>
+                    <tns:PriceClassRefID>1</tns:PriceClassRefID>
+                </tns:FareComponent>
+                <tns:FareComponent>
+                    <tns:FareComponentID>20</tns:FareComponentID>
+                    <tns:FareBasisCode>LINT</tns:FareBasisCode>
+                    <tns:FareTypeCode>SUNECO</tns:FareTypeCode>
+                    <tns:SegmentRefID>1</tns:SegmentRefID>
+                    <tns:SegmentRefID>2</tns:SegmentRefID>
+                    <tns:PriceClassRefID>2</tns:PriceClassRefID>
+                </tns:FareComponent>
+                <tns:FareComponent>
+                    <tns:FareComponentID>1</tns:FareComponentID>
+                    <tns:FareBasisCode>LINT</tns:FareBasisCode>
+                    <tns:FareTypeCode>SUNECO</tns:FareTypeCode>
+                    <tns:PriceClassRefID>1</tns:PriceClassRefID>
+                </tns:FareComponent>
+                <tns:FareComponent>
+                    <tns:FareComponentID>20</tns:FareComponentID>
+                    <tns:FareBasisCode>LINT</tns:FareBasisCode>
+                    <tns:FareTypeCode>SUNECO</tns:FareTypeCode>
+                    <tns:PriceClassRefID>2</tns:PriceClassRefID>
+                </tns:FareComponent>
+            </tns:FareComponentList>
+            <tns:PriceClassList>
+                <tns:PriceClass>
+                    <tns:Code>L</tns:Code>
+                </tns:PriceClass>
+                <tns:PriceClass>
+                    <tns:Code>L</tns:Code>
+                </tns:PriceClass>
+                <tns:PriceClass>
+                    <tns:Code>L</tns:Code>
+                </tns:PriceClass>
+                <tns:PriceClass>
+                    <tns:Code>L</tns:Code>
+                </tns:PriceClass>
+            </tns:PriceClassList>
+        </tns:EntityLists>
+    </tns:Response>
+</tns:AirShopResponse>

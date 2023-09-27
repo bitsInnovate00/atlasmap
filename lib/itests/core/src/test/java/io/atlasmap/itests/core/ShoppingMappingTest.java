@@ -35,16 +35,18 @@ public class ShoppingMappingTest {
 
     @Test
     public void test() throws Exception {
-        URL url = Thread.currentThread().getContextClassLoader().getResource("mappings/shopping/checkFieldTypeIssue.json");
+        URL url = Thread.currentThread().getContextClassLoader().getResource("mappings/shopping/shoppingResponseMapping.json");
         AtlasContext context = DefaultAtlasContextFactory.getInstance().createContext(url.toURI());
         AtlasSession session = context.createSession();
         String sourceJson = new String(Files.readAllBytes(Paths.get(
-                Thread.currentThread().getContextClassLoader().getResource("data/shopping/nativeResponse.xml").toURI())));
-            session.setSourceDocument("AirAvailabilityRS-atlas-93bbf193-bae6-4638-b921-2f951addc488", sourceJson);
+                Thread.currentThread().getContextClassLoader().getResource("data/shopping/multiODnativeResponse.xml").toURI())));
+            // session.setSourceDocument("AirAvailabilityRS-atlas-93bbf193-bae6-4638-b921-2f951addc488", sourceJson);
+            session.setSourceDocument("AirAvailabilityRS-atlas-eed8666a-81fd-4175-926f-b0d7279c18fc", sourceJson);
             context.process(session);
             System.out.println(TestHelper.printAudit(session));
             // assertFalse(session.hasErrors(), TestHelper.printAudit(session));
-            String targetXml = (String) session.getTargetDocument("AirShopResponse-8c0e6bf4-ce0f-4523-8cd7-1ae746d98a1f");
+            // String targetXml = (String) session.getTargetDocument("AirShopResponse-8c0e6bf4-ce0f-4523-8cd7-1ae746d98a1f");
+            String targetXml = (String) session.getTargetDocument("AirShopResponse-1af7506b-fdbb-4095-98af-beea10b98f36");
              System.out.println("target XML is "+ targetXml);
             // assertNotNull("target XML is null", targetXml);
             // HashMap<String, String> namespaces = new HashMap<>();

@@ -48,7 +48,7 @@
           "outputField" : [ {
             "jsonType" : "io.atlasmap.xml.v2.XmlField",
             "docId" : "AirShopResponse-8c0e6bf4-ce0f-4523-8cd7-1ae746d98a1f",
-            "path" : "/tns:AirShopResponse/tns:Response/tns:EntityLists/tns:OriginDestList/tns:OriginDest<>/tns:JourneyRefID<>",
+            "path" : "/tns:AirShopResponse/tns:Response/tns:EntityLists/tns:OriginDestList/tns:OriginDest<>/tns:JourneyRefID",
             "name" : "JourneyRefID",
             "userCreated" : false,
             "attribute" : false
