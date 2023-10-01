@@ -1,0 +1,95 @@
+{
+    "AtlasMapping" : {
+      "jsonType" : "io.atlasmap.v2.AtlasMapping",
+      "dataSource" : [ {
+        "jsonType" : "io.atlasmap.xml.v2.XmlDataSource",
+        "id" : "AirAvailabilityRS-atlas-93bbf193-bae6-4638-b921-2f951addc488",
+        "name" : "AirAvailabilityRS-atlas",
+        "description" : "Source document AirAvailabilityRS-atlas type: XSD",
+        "uri" : "atlas:xml:AirAvailabilityRS-atlas-93bbf193-bae6-4638-b921-2f951addc488",
+        "dataSourceType" : "SOURCE",
+        "xmlNamespaces" : {
+          "xmlNamespace" : [ {
+            "alias" : "urn",
+            "uri" : "http://www.ibsplc.com/iRes/simpleTypes/"
+          } ]
+        }
+      }, {
+        "jsonType" : "io.atlasmap.xml.v2.XmlDataSource",
+        "id" : "AirShopResponse-8c0e6bf4-ce0f-4523-8cd7-1ae746d98a1f",
+        "name" : "AirShopResponse",
+        "description" : "Target document AirShopResponse type: XSD",
+        "uri" : "atlas:xml:AirShopResponse-8c0e6bf4-ce0f-4523-8cd7-1ae746d98a1f",
+        "dataSourceType" : "TARGET",
+        "xmlNamespaces" : {
+          "xmlNamespace" : [ {
+            "alias" : "tns",
+            "uri" : "http://www.iata.org/IATA/2015/EASD/00/IATA_OffersAndOrdersMessage"
+          } ]
+        }
+      } ],
+      "mappings" : {
+        "mapping" : [ {
+          "jsonType" : "io.atlasmap.v2.Mapping",
+          "inputFieldGroup" : {
+            "jsonType" : "io.atlasmap.v2.FieldGroup",
+            "actions" : [ ],
+            "field" : [ {
+              "jsonType" : "io.atlasmap.xml.v2.XmlField",
+              "docId" : "AirAvailabilityRS-atlas-93bbf193-bae6-4638-b921-2f951addc488",
+              "path" : "/AirAvailabilityRS/OriginDestinationInfo<>/@SearchIndex",
+              "fieldType" : "INTEGER",
+              "name" : "SearchIndex",
+              "userCreated" : false,
+              "attribute" : true
+            } ]
+          },
+          "inputField" : [ ],
+          "outputField" : [ {
+            "jsonType" : "io.atlasmap.xml.v2.XmlField",
+            "docId" : "AirShopResponse-8c0e6bf4-ce0f-4523-8cd7-1ae746d98a1f",
+            "path" : "/tns:AirShopResponse/tns:Response/tns:EntityLists/tns:OriginDestList/tns:OriginDest<>/tns:JourneyRefID",
+            "name" : "JourneyRefID",
+            "userCreated" : false,
+            "attribute" : false
+          } ],
+          "id" : "mapping.514418"
+        }, {
+          "jsonType" : "io.atlasmap.v2.Mapping",
+          "inputFieldGroup" : {
+            "jsonType" : "io.atlasmap.v2.FieldGroup",
+            "actions" : [ ],
+            "field" : [ {
+              "jsonType" : "io.atlasmap.xml.v2.XmlField",
+              "docId" : "AirAvailabilityRS-atlas-93bbf193-bae6-4638-b921-2f951addc488",
+              "path" : "/AirAvailabilityRS/OriginDestinationInfo<>/TripInfo<>/@TripIndex",
+              "fieldType" : "LONG",
+              "name" : "TripIndex",
+              "userCreated" : false,
+              "attribute" : true
+            } ]
+          },
+          "inputField" : [ ],
+          "outputField" : [ {
+            "jsonType" : "io.atlasmap.xml.v2.XmlField",
+            "docId" : "AirShopResponse-8c0e6bf4-ce0f-4523-8cd7-1ae746d98a1f",
+            "path" : "/tns:AirShopResponse/tns:Response/tns:EntityLists/tns:JourneyList/tns:Journey<>/tns:JourneyID",
+            "name" : "JourneyID",
+            "userCreated" : false,
+            "attribute" : false
+          } ],
+          "id" : "mapping.279430"
+        } ]
+      },
+      "lookupTables" : {
+        "lookupTable" : [ ]
+      },
+      "constants" : {
+        "constant" : [ ]
+      },
+      "properties" : {
+        "property" : [ ]
+      },
+      "name" : "UI.0"
+    }
+  }
