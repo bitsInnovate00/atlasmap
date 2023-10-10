@@ -121,8 +121,9 @@ export function fromFieldToIFieldsNode(field: Field): IAtlasmapField | null {
         isInCollection: field.isInCollection(),
         isConnected: partOfMapping,
         isDisabled:
-          field.type === 'UNSUPPORTED' ||
-          (field.type === 'COMPLEX' && !field.enumeration),
+          field.type === 'UNSUPPORTED' ,
+          // ||
+          // (field.type === 'COMPLEX' && !field.enumeration),
         enumeration: field.enumeration,
       }
     : null;
